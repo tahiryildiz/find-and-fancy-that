@@ -12,9 +12,11 @@ interface WishlistHeaderProps {
   itemCount: number;
   isAdmin: boolean;
   onToggleAdmin: (isAdmin: boolean) => void;
+  categories: string[];
+  onAddCategory: (category: string) => void;
 }
 
-const categories: { value: WishlistCategory; label: string }[] = [
+const defaultCategories: { value: WishlistCategory; label: string }[] = [
   { value: 'all', label: 'Her Şey' },
   { value: 'lifestyle', label: 'Yaşam Tarzı' },
   { value: 'tech', label: 'Teknoloji' },
@@ -32,6 +34,8 @@ export function WishlistHeader({
   itemCount,
   isAdmin,
   onToggleAdmin,
+  categories,
+  onAddCategory,
 }: WishlistHeaderProps) {
   return (
     <div className="space-y-6">
@@ -54,13 +58,13 @@ export function WishlistHeader({
           >
             {isAdmin ? 'Yönetici' : 'Sadece Görüntüle'}
           </button>
-          {isAdmin && <AddItemDialog onAddItem={onAddItem} />}
+          {isAdmin && <AddItemDialog onAddItem={onAddItem} categories={categories} onAddCategory={onAddCategory} />}
         </div>
       </div>
 
       {/* Categories */}
       <nav className="flex flex-wrap gap-6 text-sm">
-        {categories.map((category) => (
+        {defaultCategories.map((category) => (
           <button
             key={category.value}
             onClick={() => onCategoryChange(category.value)}

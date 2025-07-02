@@ -9,9 +9,9 @@
     --background: 0 0% 99%;
     --foreground: 220 8% 15%;
 
-    --card: 0 0% 100%;
+    --card: 22 100% 95%;
     --card-foreground: 220 8% 15%;
-    --card-border: 220 13% 91%;
+    --card-border: 22 100% 90%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 220 8% 15%;
@@ -68,9 +68,9 @@
     --background: 220 13% 9%;
     --foreground: 220 14% 96%;
 
-    --card: 220 13% 11%;
-    --card-foreground: 220 14% 96%;
-    --card-border: 220 13% 18%;
+    --card: 22 100% 95%;
+    --card-foreground: 220 8% 15%;
+    --card-border: 22 100% 90%;
 
     --popover: 220 13% 11%;
     --popover-foreground: 220 14% 96%;

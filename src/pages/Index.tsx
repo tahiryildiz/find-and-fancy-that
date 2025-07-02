@@ -43,6 +43,7 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<WishlistCategory>("all");
   const [isAdmin, setIsAdmin] = useState(false); // Simple admin toggle
+  const [categories, setCategories] = useState<string[]>(["Tech", "Lifestyle", "Moda", "Ev", "Diğer"]);
   const { toast } = useToast();
 
   const handleAddItem = (newItem: Omit<WishlistItemType, 'id' | 'dateAdded'>) => {
@@ -60,6 +61,16 @@ const Index = () => {
       title: "Ürün kaldırıldı",
       description: "Ürün istek listenizden kaldırıldı.",
     });
+  };
+
+  const handleAddCategory = (newCategory: string) => {
+    if (!categories.includes(newCategory)) {
+      setCategories([...categories, newCategory]);
+      toast({
+        title: "Kategori eklendi",
+        description: `"${newCategory}" kategorisi eklendi.`,
+      });
+    }
   };
 
   const filteredItems = useMemo(() => {
@@ -90,6 +101,8 @@ const Index = () => {
           itemCount={filteredItems.length}
           isAdmin={isAdmin}
           onToggleAdmin={setIsAdmin}
+          categories={categories}
+          onAddCategory={handleAddCategory}
         />
 
         {/* Items Grid */}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,14 +13,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { WishlistItem } from "@/types/wishlist";
 import { useToast } from "@/hooks/use-toast";
 
 interface AddItemDialogProps {
   onAddItem: (item: Omit<WishlistItem, 'id' | 'dateAdded'>) => void;
+  categories: string[];
+  onAddCategory: (category: string) => void;
 }
 
-export function AddItemDialog({ onAddItem }: AddItemDialogProps) {
+export function AddItemDialog({ onAddItem, categories, onAddCategory }: AddItemDialogProps) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
@@ -28,6 +31,8 @@ export function AddItemDialog({ onAddItem }: AddItemDialogProps) {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [showNewCategory, setShowNewCategory] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -70,6 +75,8 @@ export function AddItemDialog({ onAddItem }: AddItemDialogProps) {
     setDescription("");
     setCategory("");
     setPrice("");
+    setNewCategory("");
+    setShowNewCategory(false);
     setOpen(false);
 
     toast({
@@ -107,12 +114,49 @@ export function AddItemDialog({ onAddItem }: AddItemDialogProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="category">Kategori</Label>
-              <Input
-                id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                placeholder="örn., Teknoloji, Moda"
-              />
+              <Select value={category} onValueChange={(value) => {
+                if (value === "new") {
+                  setShowNewCategory(true);
+                  setCategory("");
+                } else {
+                  setCategory(value);
+                  setShowNewCategory(false);
+                }
+              }}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Kategori seçin" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="new">+ Yeni Kategori Ekle</SelectItem>
+                </SelectContent>
+              </Select>
+              {showNewCategory && (
+                <div className="flex gap-2">
+                  <Input
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    placeholder="Yeni kategori adı"
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      if (newCategory.trim()) {
+                        onAddCategory(newCategory.trim());
+                        setCategory(newCategory.trim());
+                        setNewCategory("");
+                        setShowNewCategory(false);
+                      }
+                    }}
+                  >
+                    Ekle
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
           
