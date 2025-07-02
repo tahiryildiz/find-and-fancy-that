@@ -86,7 +86,12 @@ export default function Dashboard() {
   };
 
   const viewWishlist = (slug: string) => {
-    navigate(`/w/${slug}`);
+    const wishlist = wishlists.find(w => w.slug === slug);
+    if (wishlist && wishlist.item_count === 0) {
+      navigate(`/manage/${slug}`);
+    } else {
+      navigate(`/w/${slug}`);
+    }
   };
 
   if (loading) {
@@ -186,7 +191,20 @@ export default function Dashboard() {
                     <Badge variant={wishlist.is_public ? "default" : "outline"} className="text-xs px-3 py-1">
                       {wishlist.is_public ? 'Public' : 'Private'}
                     </Badge>
+                    <div 
+                      className="w-4 h-4 rounded-full border border-border/30 flex-shrink-0"
+                      style={{ backgroundColor: wishlist.background_color }}
+                      title={`Background: ${wishlist.background_color}`}
+                    />
                   </div>
+                  
+                  {wishlist.item_count === 0 && (
+                    <div className="mb-4 p-3 bg-accent/10 rounded-lg border border-accent/20">
+                      <p className="text-xs text-accent font-medium mb-1">Ready to add items!</p>
+                      <p className="text-xs text-muted-foreground">Click "Manage" to start adding products to your wishlist.</p>
+                    </div>
+                  )}
+                  
                   <div className="flex items-center gap-3">
                     <Button 
                       variant="outline" 
@@ -195,7 +213,7 @@ export default function Dashboard() {
                       className="flex-1 gap-2 hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-all"
                     >
                       <Eye className="w-4 h-4" />
-                      View
+                      {wishlist.item_count === 0 ? 'Manage' : 'View'}
                     </Button>
                     <Button 
                       variant="outline" 
