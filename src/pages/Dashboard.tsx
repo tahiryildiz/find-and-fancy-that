@@ -101,58 +101,63 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-brand-subtle/30">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-              <span className="text-lg font-bold text-primary">W</span>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-brand-subtle/20">
+      {/* Header with proper spacing */}
+      <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm">
+        <div className="container mx-auto px-6 py-6 max-w-7xl">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-lg font-bold text-primary-foreground">W</span>
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-foreground tracking-tight">My Wishlists</h1>
+                <p className="text-brand-text mt-1 text-sm">
+                  Welcome back, {user?.user_metadata?.display_name || user?.email?.split('@')[0]}! 
+                  {wishlists.reduce((total, w) => total + (w.item_count || 0), 0)} items across {wishlists.length} {wishlists.length === 1 ? 'wishlist' : 'wishlists'}.
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">My Wishlists</h1>
-              <p className="text-brand-text">
-                Welcome back {user?.user_metadata?.display_name || user?.email?.split('@')[0]}! 
-                {wishlists.reduce((total, w) => total + (w.item_count || 0), 0)} items across {wishlists.length} {wishlists.length === 1 ? 'wishlist' : 'wishlists'}.
-              </p>
+            <div className="flex items-center gap-3">
+              <Button onClick={() => setCreateDialogOpen(true)} className="gap-2 shadow-lg hover:shadow-xl transition-all">
+                <Plus className="w-4 h-4" />
+                Create New List
+              </Button>
+              <Button variant="outline" onClick={signOut} className="shadow-sm hover:shadow-md transition-all">
+                Sign Out
+              </Button>
             </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button onClick={() => setCreateDialogOpen(true)} className="gap-2 shadow-lg">
-              <Plus className="w-4 h-4" />
-              Create New List
-            </Button>
-            <Button variant="outline" onClick={signOut} className="shadow-sm">
-              Sign Out
-            </Button>
           </div>
         </div>
+      </header>
 
+      {/* Main content with proper margins */}
+      <main className="container mx-auto px-6 py-12 max-w-7xl">
         {/* Wishlists Grid */}
         {wishlists.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center shadow-lg">
+          <div className="text-center py-20 max-w-lg mx-auto">
+            <div className="w-24 h-24 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center shadow-lg">
               <Plus className="w-10 h-10 text-primary" />
             </div>
             <h3 className="text-2xl font-bold text-foreground mb-4">
               Create Your First Wishlist
             </h3>
-            <p className="text-brand-text max-w-md mx-auto mb-8 leading-relaxed">
+            <p className="text-brand-text mb-8 leading-relaxed text-lg">
               Organize your favorite products, track what you want to buy next, and share with friends and family.
             </p>
-            <Button onClick={() => setCreateDialogOpen(true)} size="lg" className="gap-2 shadow-lg">
+            <Button onClick={() => setCreateDialogOpen(true)} size="lg" className="gap-2 shadow-lg hover:shadow-xl transition-all px-8">
               <Plus className="w-5 h-5" />
               Create Wishlist
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {wishlists.map((wishlist) => (
-              <Card key={wishlist.id} className="group hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm">
-                <CardHeader className="pb-3">
+              <Card key={wishlist.id} className="group hover:shadow-xl transition-all duration-300 border border-border/50 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm overflow-hidden">
+                <CardHeader className="pb-4 p-6">
                   <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg font-semibold text-foreground mb-1">{wishlist.title}</CardTitle>
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-xl font-semibold text-foreground mb-2 truncate">{wishlist.title}</CardTitle>
                       <CardDescription className="text-sm text-brand-text">
                         Created {new Date(wishlist.created_at).toLocaleDateString('en-US', { 
                           month: 'short', 
@@ -165,29 +170,29 @@ export default function Dashboard() {
                       <img 
                         src={wishlist.logo_url} 
                         alt="Logo" 
-                        className="w-10 h-10 object-contain rounded-lg shadow-sm"
+                        className="w-12 h-12 object-contain rounded-lg shadow-sm ml-4 flex-shrink-0"
                       />
                     )}
                   </div>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="flex items-center gap-2 mb-4">
+                <CardContent className="pt-0 p-6">
+                  <div className="flex items-center gap-3 mb-6">
                     <Badge 
                       variant="secondary" 
-                      className="text-xs font-medium bg-primary/10 text-primary border-primary/20"
+                      className="text-xs font-medium bg-primary/10 text-primary border-primary/20 px-3 py-1"
                     >
                       {wishlist.item_count || 0} items
                     </Badge>
-                    <Badge variant={wishlist.is_public ? "default" : "outline"} className="text-xs">
+                    <Badge variant={wishlist.is_public ? "default" : "outline"} className="text-xs px-3 py-1">
                       {wishlist.is_public ? 'Public' : 'Private'}
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <Button 
                       variant="outline" 
                       size="sm" 
                       onClick={() => viewWishlist(wishlist.slug)}
-                      className="flex-1 gap-2 hover:bg-primary/10 hover:text-primary hover:border-primary/30"
+                      className="flex-1 gap-2 hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-all"
                     >
                       <Eye className="w-4 h-4" />
                       View
@@ -196,7 +201,7 @@ export default function Dashboard() {
                       variant="outline" 
                       size="sm" 
                       onClick={() => setEditingWishlist(wishlist)}
-                      className="hover:bg-accent/10 hover:text-accent hover:border-accent/30"
+                      className="hover:bg-accent/10 hover:text-accent hover:border-accent/30 transition-all"
                     >
                       <Settings className="w-4 h-4" />
                     </Button>
@@ -204,7 +209,7 @@ export default function Dashboard() {
                       variant="outline" 
                       size="sm" 
                       onClick={() => copyShareLink(wishlist.slug)}
-                      className="hover:bg-secondary/10 hover:text-secondary hover:border-secondary/30"
+                      className="hover:bg-secondary/10 hover:text-secondary hover:border-secondary/30 transition-all"
                     >
                       <Share className="w-4 h-4" />
                     </Button>
@@ -214,7 +219,7 @@ export default function Dashboard() {
             ))}
           </div>
         )}
-      </div>
+      </main>
 
       <CreateWishlistDialog
         open={createDialogOpen}
