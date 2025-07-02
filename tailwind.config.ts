@@ -18,6 +18,15 @@ export default {
 			}
 		},
 		extend: {
+			backgroundImage: {
+				'gradient-subtle': 'var(--gradient-subtle)',
+				'gradient-card': 'var(--gradient-card)'
+			},
+			boxShadow: {
+				'soft': '0 1px 3px 0 hsl(var(--shadow-soft) / 0.1), 0 1px 2px 0 hsl(var(--shadow-soft) / 0.06)',
+				'medium': '0 4px 6px -1px hsl(var(--shadow-soft) / 0.1), 0 2px 4px -1px hsl(var(--shadow-soft) / 0.06)',
+				'large': '0 10px 15px -3px hsl(var(--shadow-soft) / 0.1), 0 4px 6px -2px hsl(var(--shadow-soft) / 0.05)'
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -50,7 +59,15 @@ export default {
 				},
 				card: {
 					DEFAULT: 'hsl(var(--card))',
-					foreground: 'hsl(var(--card-foreground))'
+					foreground: 'hsl(var(--card-foreground))',
+					border: 'hsl(var(--card-border))'
+				},
+				brand: {
+					subtle: 'hsl(var(--brand-subtle))',
+					text: 'hsl(var(--brand-text))'
+				},
+				hover: {
+					subtle: 'hsl(var(--hover-subtle))'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
