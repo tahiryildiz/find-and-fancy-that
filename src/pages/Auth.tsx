@@ -11,7 +11,6 @@ export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
   const { toast } = useToast();
@@ -26,7 +25,7 @@ export default function Auth() {
       if (isLogin) {
         result = await signIn(email, password);
       } else {
-        result = await signUp(email, password, displayName);
+        result = await signUp(email, password);
       }
 
       if (result.error) {
@@ -59,8 +58,8 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex">
       {/* Left Column - Cover Image */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-subtle relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/30" />
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary/30 via-accent/20 to-primary/10 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-accent/30" />
         <div className="relative z-10 flex flex-col justify-center px-12 text-foreground">
           <div className="max-w-md">
             <div className="flex items-center space-x-3 mb-8">
@@ -105,24 +104,9 @@ export default function Auth() {
           </div>
 
           {/* Auth Form */}
-          <Card className="border border-card-border shadow-lg">
+          <Card className="border border-card-border shadow-lg bg-gradient-to-b from-background to-background/95">
             <CardContent className="p-6">
               <form onSubmit={handleSubmit} className="space-y-5">
-                {!isLogin && (
-                  <div className="space-y-2">
-                    <Label htmlFor="displayName" className="text-sm font-medium text-foreground">Name</Label>
-                    <Input
-                      id="displayName"
-                      placeholder="Your full name"
-                      type="text"
-                      value={displayName}
-                      onChange={(e) => setDisplayName(e.target.value)}
-                      required={!isLogin}
-                      disabled={loading}
-                      className="h-11"
-                    />
-                  </div>
-                )}
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-sm font-medium text-foreground">Email</Label>
                   <Input
