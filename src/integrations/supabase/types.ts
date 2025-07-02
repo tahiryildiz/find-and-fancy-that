@@ -9,7 +9,202 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          wishlist_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          wishlist_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          wishlist_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_wishlist_id_fkey"
+            columns: ["wishlist_id"]
+            isOneToOne: false
+            referencedRelation: "wishlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      item_interactions: {
+        Row: {
+          created_at: string
+          id: string
+          interaction_type: string
+          ip_address: unknown | null
+          item_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          interaction_type: string
+          ip_address?: unknown | null
+          item_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          interaction_type?: string
+          ip_address?: unknown | null
+          item_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "item_interactions_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      items: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          description: string | null
+          heart_count: number | null
+          id: string
+          image_url: string | null
+          price: string | null
+          thumbs_up_count: number | null
+          title: string
+          updated_at: string
+          url: string | null
+          wishlist_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          heart_count?: number | null
+          id?: string
+          image_url?: string | null
+          price?: string | null
+          thumbs_up_count?: number | null
+          title: string
+          updated_at?: string
+          url?: string | null
+          wishlist_id: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          heart_count?: number | null
+          id?: string
+          image_url?: string | null
+          price?: string | null
+          thumbs_up_count?: number | null
+          title?: string
+          updated_at?: string
+          url?: string | null
+          wishlist_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "items_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "items_wishlist_id_fkey"
+            columns: ["wishlist_id"]
+            isOneToOne: false
+            referencedRelation: "wishlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wishlists: {
+        Row: {
+          background_color: string | null
+          created_at: string
+          font_family: string | null
+          id: string
+          is_public: boolean | null
+          language: string | null
+          logo_url: string | null
+          slug: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          background_color?: string | null
+          created_at?: string
+          font_family?: string | null
+          id?: string
+          is_public?: boolean | null
+          language?: string | null
+          logo_url?: string | null
+          slug: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          background_color?: string | null
+          created_at?: string
+          font_family?: string | null
+          id?: string
+          is_public?: boolean | null
+          language?: string | null
+          logo_url?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
