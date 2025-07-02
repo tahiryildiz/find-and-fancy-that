@@ -57,25 +57,31 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
-      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-        <div className="flex flex-col space-y-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">
+    <div className="min-h-screen bg-gradient-subtle flex flex-col items-center justify-center px-4">
+      <div className="mx-auto flex w-full flex-col justify-center space-y-8 sm:w-[420px]">
+        {/* Logo/Brand Section */}
+        <div className="flex flex-col space-y-4 text-center">
+          <div className="mx-auto w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center shadow-lg">
+            <span className="text-xl font-bold text-primary-foreground">W</span>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
             {isLogin ? 'Hesabınıza giriş yapın' : 'Hesap oluşturun'}
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-brand-text max-w-sm mx-auto">
             {isLogin 
               ? 'İstek listelerinize erişmek için e-posta adresinizi girin'
               : 'Başlamak için aşağıdaki bilgileri girin'
             }
           </p>
         </div>
-        <Card>
-          <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
+
+        {/* Auth Form */}
+        <Card className="border-0 shadow-xl bg-card/60 backdrop-blur-sm">
+          <CardContent className="p-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {!isLogin && (
                 <div className="space-y-2">
-                  <Label htmlFor="displayName">İsim</Label>
+                  <Label htmlFor="displayName" className="text-sm font-medium text-foreground">İsim</Label>
                   <Input
                     id="displayName"
                     placeholder="Adınız"
@@ -84,11 +90,12 @@ export default function Auth() {
                     onChange={(e) => setDisplayName(e.target.value)}
                     required={!isLogin}
                     disabled={loading}
+                    className="h-12 rounded-lg border-card-border bg-background/50 focus:bg-background transition-colors"
                   />
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="email">E-posta</Label>
+                <Label htmlFor="email" className="text-sm font-medium text-foreground">E-posta</Label>
                 <Input
                   id="email"
                   placeholder="isim@ornek.com"
@@ -97,10 +104,11 @@ export default function Auth() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   disabled={loading}
+                  className="h-12 rounded-lg border-card-border bg-background/50 focus:bg-background transition-colors"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Şifre</Label>
+                <Label htmlFor="password" className="text-sm font-medium text-foreground">Şifre</Label>
                 <Input
                   id="password"
                   type="password"
@@ -108,39 +116,33 @@ export default function Auth() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={loading}
+                  className="h-12 rounded-lg border-card-border bg-background/50 focus:bg-background transition-colors"
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button 
+                type="submit" 
+                className="w-full h-12 text-base font-medium" 
+                disabled={loading}
+              >
                 {loading ? 'Yükleniyor...' : (isLogin ? 'Giriş Yap' : 'Hesap Oluştur')}
               </Button>
             </form>
           </CardContent>
         </Card>
-        <p className="px-8 text-center text-sm text-muted-foreground">
-          {isLogin ? (
-            <>
-              Hesabınız yok mu?{' '}
-              <Button
-                variant="link"
-                onClick={() => setIsLogin(false)}
-                className="p-0 h-auto font-normal underline-offset-4"
-              >
-                Kayıt olun
-              </Button>
-            </>
-          ) : (
-            <>
-              Zaten hesabınız var mı?{' '}
-              <Button
-                variant="link"
-                onClick={() => setIsLogin(true)}
-                className="p-0 h-auto font-normal underline-offset-4"
-              >
-                Giriş yapın
-              </Button>
-            </>
-          )}
-        </p>
+
+        {/* Switch Mode */}
+        <div className="text-center">
+          <span className="text-sm text-brand-text">
+            {isLogin ? 'Hesabınız yok mu? ' : 'Zaten hesabınız var mı? '}
+          </span>
+          <Button
+            variant="link"
+            onClick={() => setIsLogin(!isLogin)}
+            className="p-0 h-auto font-medium text-primary hover:text-primary/80"
+          >
+            {isLogin ? 'Kayıt olun' : 'Giriş yapın'}
+          </Button>
+        </div>
       </div>
     </div>
   );
