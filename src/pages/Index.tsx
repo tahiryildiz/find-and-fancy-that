@@ -42,6 +42,7 @@ const Index = () => {
   const [items, setItems] = useState<WishlistItemType[]>(sampleItems);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<WishlistCategory>("all");
+  const [isAdmin, setIsAdmin] = useState(false); // Simple admin toggle
   const { toast } = useToast();
 
   const handleAddItem = (newItem: Omit<WishlistItemType, 'id' | 'dateAdded'>) => {
@@ -87,6 +88,8 @@ const Index = () => {
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
           itemCount={filteredItems.length}
+          isAdmin={isAdmin}
+          onToggleAdmin={setIsAdmin}
         />
 
         {/* Items Grid */}

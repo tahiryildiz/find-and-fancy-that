@@ -22,7 +22,7 @@ export function WishlistItem({ item, onDelete }: WishlistItemProps) {
   };
 
   return (
-    <Card className="group overflow-hidden bg-gradient-card border-card-border hover:shadow-medium transition-all duration-300 hover:scale-[1.02]">
+    <Card className="group overflow-hidden bg-card border-border hover:shadow-sm transition-all duration-200">
       <div className="relative">
         {/* Image */}
         {item.image && (
@@ -57,14 +57,13 @@ export function WishlistItem({ item, onDelete }: WishlistItemProps) {
       </div>
 
       <div className="p-4 space-y-3">
-        {/* Category and Title */}
-        <div className="space-y-2">
+        {/* Brand and Category */}
+        <div className="space-y-1">
           {item.category && (
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-brand-text uppercase tracking-wide">
-                {item.category}
+              <span className="text-xs text-brand-text font-light">
+                Brand · {item.category}
               </span>
-              <ExternalLink className="h-3 w-3 text-brand-text" />
             </div>
           )}
           
@@ -72,15 +71,15 @@ export function WishlistItem({ item, onDelete }: WishlistItemProps) {
             onClick={handleLinkClick}
             className="text-left w-full group-button"
           >
-            <h3 className="font-semibold text-foreground hover:text-primary transition-colors duration-200 line-clamp-2">
+            <h3 className="font-medium text-foreground hover:text-primary transition-colors duration-200 line-clamp-2">
               {item.title}
             </h3>
           </button>
         </div>
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-          {item.description}
+        <p className="text-sm text-muted-foreground line-clamp-4 leading-relaxed">
+          {item.description.length > 200 ? item.description.slice(0, 200) + '...' : item.description}
         </p>
 
         {/* Price */}
