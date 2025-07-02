@@ -57,69 +57,91 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{isLogin ? 'Giriş Yap' : 'Kayıt Ol'}</CardTitle>
-          <CardDescription>
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
+      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+        <div className="flex flex-col space-y-2 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {isLogin ? 'Hesabınıza giriş yapın' : 'Hesap oluşturun'}
+          </h1>
+          <p className="text-sm text-muted-foreground">
             {isLogin 
-              ? 'İstek listelerinize erişmek için giriş yapın.'
-              : 'Yeni bir hesap oluşturun ve kendi istek listelerinizi oluşturmaya başlayın.'
+              ? 'İstek listelerinize erişmek için e-posta adresinizi girin'
+              : 'Başlamak için aşağıdaki bilgileri girin'
             }
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
+          </p>
+        </div>
+        <Card>
+          <CardContent className="pt-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {!isLogin && (
+                <div className="space-y-2">
+                  <Label htmlFor="displayName">İsim</Label>
+                  <Input
+                    id="displayName"
+                    placeholder="Adınız"
+                    type="text"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    required={!isLogin}
+                    disabled={loading}
+                  />
+                </div>
+              )}
               <div className="space-y-2">
-                <Label htmlFor="displayName">İsim</Label>
+                <Label htmlFor="email">E-posta</Label>
                 <Input
-                  id="displayName"
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  required={!isLogin}
+                  id="email"
+                  placeholder="isim@ornek.com"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
                 />
               </div>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="email">E-posta</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Şifre</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Yükleniyor...' : (isLogin ? 'Giriş Yap' : 'Kayıt Ol')}
-            </Button>
-          </form>
-          <div className="mt-4 text-center">
-            <Button
-              variant="link"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm"
-            >
-              {isLogin 
-                ? 'Hesabınız yok mu? Kayıt olun.'
-                : 'Zaten hesabınız var mı? Giriş yapın.'
-              }
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+              <div className="space-y-2">
+                <Label htmlFor="password">Şifre</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Yükleniyor...' : (isLogin ? 'Giriş Yap' : 'Hesap Oluştur')}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+        <p className="px-8 text-center text-sm text-muted-foreground">
+          {isLogin ? (
+            <>
+              Hesabınız yok mu?{' '}
+              <Button
+                variant="link"
+                onClick={() => setIsLogin(false)}
+                className="p-0 h-auto font-normal underline-offset-4"
+              >
+                Kayıt olun
+              </Button>
+            </>
+          ) : (
+            <>
+              Zaten hesabınız var mı?{' '}
+              <Button
+                variant="link"
+                onClick={() => setIsLogin(true)}
+                className="p-0 h-auto font-normal underline-offset-4"
+              >
+                Giriş yapın
+              </Button>
+            </>
+          )}
+        </p>
+      </div>
     </div>
   );
 }
