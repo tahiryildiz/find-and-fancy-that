@@ -20,7 +20,7 @@ export function CreateWishlistDialog({ open, onOpenChange, onWishlistCreated }: 
   const { user } = useAuth();
   const [title, setTitle] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('#fff2eb');
-  const [language, setLanguage] = useState<Language>('tr');
+  const [language, setLanguage] = useState<Language>('en');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -65,14 +65,14 @@ export function CreateWishlistDialog({ open, onOpenChange, onWishlistCreated }: 
       onWishlistCreated(data);
       setTitle('');
       setBackgroundColor('#fff2eb');
-      setLanguage('tr');
+      setLanguage('en');
       toast({
-        title: t('success', language),
-        description: 'İstek listesi başarıyla oluşturuldu.',
+        title: 'Success',
+        description: 'Wishlist created successfully.',
       });
     } catch (error: any) {
       toast({
-        title: 'Hata',
+        title: 'Error',
         description: error.message,
         variant: 'destructive',
       });
@@ -85,25 +85,25 @@ export function CreateWishlistDialog({ open, onOpenChange, onWishlistCreated }: 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Yeni İstek Listesi</DialogTitle>
+          <DialogTitle>Create New Wishlist</DialogTitle>
           <DialogDescription>
-            Yeni bir istek listesi oluşturun ve özelleştirin.
+            Create and customize a new wishlist.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Liste Başlığı</Label>
+            <Label htmlFor="title">List Title</Label>
             <Input
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Örn: Düğün İstek Listem"
+              placeholder="e.g. Wedding Wishlist"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="backgroundColor">Arkaplan Rengi</Label>
+            <Label htmlFor="backgroundColor">Background Color</Label>
             <div className="flex gap-2">
               <Input
                 id="backgroundColor"
@@ -122,7 +122,7 @@ export function CreateWishlistDialog({ open, onOpenChange, onWishlistCreated }: 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="language">Dil</Label>
+            <Label htmlFor="language">Language</Label>
             <Select value={language} onValueChange={(value) => setLanguage(value as Language)}>
               <SelectTrigger>
                 <SelectValue />
@@ -139,10 +139,10 @@ export function CreateWishlistDialog({ open, onOpenChange, onWishlistCreated }: 
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              İptal
+              Cancel
             </Button>
             <Button type="submit" disabled={loading || !title.trim()}>
-              {loading ? 'Oluşturuluyor...' : 'Oluştur'}
+              {loading ? 'Creating...' : 'Create'}
             </Button>
           </DialogFooter>
         </form>

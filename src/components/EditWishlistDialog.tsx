@@ -48,8 +48,8 @@ export function EditWishlistDialog({ wishlist, open, onOpenChange, onWishlistUpd
       return data.publicUrl;
     } catch (error: any) {
       toast({
-        title: 'Hata',
-        description: 'Logo yüklenirken bir hata oluştu.',
+        title: 'Error',
+        description: 'Error uploading logo.',
         variant: 'destructive',
       });
       return null;
@@ -89,12 +89,12 @@ export function EditWishlistDialog({ wishlist, open, onOpenChange, onWishlistUpd
 
       onWishlistUpdated(data);
       toast({
-        title: 'Başarılı',
-        description: 'İstek listesi güncellendi.',
+        title: 'Success',
+        description: 'Wishlist updated successfully.',
       });
     } catch (error: any) {
       toast({
-        title: 'Hata',
+        title: 'Error',
         description: error.message,
         variant: 'destructive',
       });
@@ -108,8 +108,8 @@ export function EditWishlistDialog({ wishlist, open, onOpenChange, onWishlistUpd
     if (file) {
       if (file.size > 1024 * 1024) { // 1MB limit
         toast({
-          title: 'Hata',
-          description: 'Dosya boyutu 1MB\'dan küçük olmalıdır.',
+          title: 'Error',
+          description: 'File size must be less than 1MB.',
           variant: 'destructive',
         });
         return;
@@ -122,14 +122,14 @@ export function EditWishlistDialog({ wishlist, open, onOpenChange, onWishlistUpd
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>İstek Listesini Düzenle</DialogTitle>
+          <DialogTitle>Edit Wishlist</DialogTitle>
           <DialogDescription>
-            İstek listenizin ayarlarını özelleştirin.
+            Customize your wishlist settings.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Liste Başlığı</Label>
+            <Label htmlFor="title">List Title</Label>
             <Input
               id="title"
               value={title}
@@ -139,7 +139,7 @@ export function EditWishlistDialog({ wishlist, open, onOpenChange, onWishlistUpd
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="backgroundColor">Arkaplan Rengi</Label>
+            <Label htmlFor="backgroundColor">Background Color</Label>
             <div className="flex gap-2">
               <Input
                 id="backgroundColor"
@@ -176,7 +176,7 @@ export function EditWishlistDialog({ wishlist, open, onOpenChange, onWishlistUpd
                 className="gap-2"
               >
                 <Upload className="w-4 h-4" />
-                {logoFile ? logoFile.name : 'Logo Seç'}
+                {logoFile ? logoFile.name : 'Select Logo'}
               </Button>
               <input
                 ref={fileInputRef}
@@ -187,12 +187,12 @@ export function EditWishlistDialog({ wishlist, open, onOpenChange, onWishlistUpd
               />
             </div>
             <p className="text-xs text-muted-foreground">
-              PNG, JPG veya SVG. Maksimum 1MB.
+              PNG, JPG or SVG. Maximum 1MB.
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="language">Dil</Label>
+            <Label htmlFor="language">Language</Label>
             <Select value={language} onValueChange={(value) => setLanguage(value as Language)}>
               <SelectTrigger>
                 <SelectValue />
@@ -209,9 +209,9 @@ export function EditWishlistDialog({ wishlist, open, onOpenChange, onWishlistUpd
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="isPublic">Herkese Açık</Label>
+              <Label htmlFor="isPublic">Public</Label>
               <p className="text-xs text-muted-foreground">
-                Herkes bu listeyi görüntüleyebilir
+                Anyone can view this list
               </p>
             </div>
             <Switch
@@ -223,10 +223,10 @@ export function EditWishlistDialog({ wishlist, open, onOpenChange, onWishlistUpd
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              İptal
+              Cancel
             </Button>
             <Button type="submit" disabled={loading || uploading || !title.trim()}>
-              {loading ? 'Güncelleniyor...' : 'Güncelle'}
+              {loading ? 'Updating...' : 'Update'}
             </Button>
           </DialogFooter>
         </form>
