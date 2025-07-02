@@ -31,7 +31,7 @@ export default function Auth() {
 
       if (result.error) {
         toast({
-          title: 'Hata',
+          title: 'Error',
           description: result.error.message,
           variant: 'destructive',
         });
@@ -40,14 +40,14 @@ export default function Auth() {
           navigate('/dashboard');
         } else {
           toast({
-            title: 'Kayıt başarılı',
-            description: 'Lütfen e-posta adresinizi doğrulayın.',
+            title: 'Account created successfully',
+            description: 'Please check your email to verify your account.',
           });
         }
       }
     } catch (error: any) {
       toast({
-        title: 'Hata',
+        title: 'Error',
         description: error.message,
         variant: 'destructive',
       });
@@ -57,20 +57,20 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-hero flex flex-col items-center justify-center px-4">
       <div className="mx-auto flex w-full flex-col justify-center space-y-8 sm:w-[420px]">
         {/* Logo/Brand Section */}
         <div className="flex flex-col space-y-4 text-center">
-          <div className="mx-auto w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center shadow-lg">
-            <span className="text-xl font-bold text-primary-foreground">W</span>
+          <div className="mx-auto w-12 h-12 bg-foreground rounded-xl flex items-center justify-center shadow-lg">
+            <span className="text-xl font-bold text-background">W</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            {isLogin ? 'Hesabınıza giriş yapın' : 'Hesap oluşturun'}
+            {isLogin ? 'Welcome back' : 'Create your account'}
           </h1>
           <p className="text-brand-text max-w-sm mx-auto">
             {isLogin 
-              ? 'İstek listelerinize erişmek için e-posta adresinizi girin'
-              : 'Başlamak için aşağıdaki bilgileri girin'
+              ? 'Sign in to access your wishlists and continue creating'
+              : 'Get started with Wishly and create beautiful wishlists in minutes'
             }
           </p>
         </div>
@@ -81,10 +81,10 @@ export default function Auth() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {!isLogin && (
                 <div className="space-y-2">
-                  <Label htmlFor="displayName" className="text-sm font-medium text-foreground">İsim</Label>
+                  <Label htmlFor="displayName" className="text-sm font-medium text-foreground">Name</Label>
                   <Input
                     id="displayName"
-                    placeholder="Adınız"
+                    placeholder="Your full name"
                     type="text"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
@@ -95,10 +95,10 @@ export default function Auth() {
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-foreground">E-posta</Label>
+                <Label htmlFor="email" className="text-sm font-medium text-foreground">Email</Label>
                 <Input
                   id="email"
-                  placeholder="isim@ornek.com"
+                  placeholder="name@example.com"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -108,7 +108,7 @@ export default function Auth() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-foreground">Şifre</Label>
+                <Label htmlFor="password" className="text-sm font-medium text-foreground">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -124,7 +124,7 @@ export default function Auth() {
                 className="w-full h-12 text-base font-medium" 
                 disabled={loading}
               >
-                {loading ? 'Yükleniyor...' : (isLogin ? 'Giriş Yap' : 'Hesap Oluştur')}
+                {loading ? 'Loading...' : (isLogin ? 'Sign In' : 'Create Account')}
               </Button>
             </form>
           </CardContent>
@@ -133,14 +133,14 @@ export default function Auth() {
         {/* Switch Mode */}
         <div className="text-center">
           <span className="text-sm text-brand-text">
-            {isLogin ? 'Hesabınız yok mu? ' : 'Zaten hesabınız var mı? '}
+            {isLogin ? "Don't have an account? " : 'Already have an account? '}
           </span>
           <Button
             variant="link"
             onClick={() => setIsLogin(!isLogin)}
             className="p-0 h-auto font-medium text-primary hover:text-primary/80"
           >
-            {isLogin ? 'Kayıt olun' : 'Giriş yapın'}
+            {isLogin ? 'Sign up' : 'Sign in'}
           </Button>
         </div>
       </div>
