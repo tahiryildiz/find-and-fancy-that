@@ -30,7 +30,7 @@ export function WishlistItem({ item, onDelete }: WishlistItemProps) {
             <img
               src={item.image}
               alt={item.title}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              className="w-full h-full object-cover"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
               }}
@@ -40,8 +40,8 @@ export function WishlistItem({ item, onDelete }: WishlistItemProps) {
         
         {/* New Badge */}
         {isRecent() && (
-          <Badge variant="new" className="absolute top-3 left-3 text-xs">
-            NEW
+          <Badge variant="new" className="absolute top-3 right-3 text-xs font-medium">
+            YENİ
           </Badge>
         )}
 
@@ -50,44 +50,31 @@ export function WishlistItem({ item, onDelete }: WishlistItemProps) {
           variant="ghost"
           size="icon"
           onClick={() => onDelete(item.id)}
-          className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-background/80 hover:bg-background"
+          className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-background/80 hover:bg-background"
         >
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>
 
-      <div className="p-4 space-y-3">
+      <div className="p-4 space-y-2">
         {/* Brand and Category */}
-        <div className="space-y-1">
-          {item.category && (
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-brand-text font-light">
-                Brand · {item.category}
-              </span>
-            </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-brand-text font-normal">
+            {item.category || 'Marka'} · Kategori
+          </span>
+          {item.price && (
+            <span className="text-sm font-medium text-foreground">{item.price}</span>
           )}
-          
-          <button
-            onClick={handleLinkClick}
-            className="text-left w-full group-button"
-          >
-            <h3 className="font-medium text-foreground hover:text-primary transition-colors duration-200 line-clamp-2">
-              {item.title}
-            </h3>
-          </button>
         </div>
-
-        {/* Description */}
-        <p className="text-sm text-muted-foreground line-clamp-4 leading-relaxed">
-          {item.description.length > 200 ? item.description.slice(0, 200) + '...' : item.description}
-        </p>
-
-        {/* Price */}
-        {item.price && (
-          <div className="flex justify-between items-center pt-2 border-t border-border">
-            <span className="font-semibold text-foreground">{item.price}</span>
-          </div>
-        )}
+        
+        <button
+          onClick={handleLinkClick}
+          className="text-left w-full"
+        >
+          <h3 className="font-normal text-foreground hover:text-primary transition-colors duration-200 text-sm">
+            {item.title}
+          </h3>
+        </button>
       </div>
     </Card>
   );

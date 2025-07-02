@@ -35,8 +35,8 @@ export function AddItemDialog({ onAddItem }: AddItemDialogProps) {
     
     if (!title.trim() || !url.trim() || !description.trim()) {
       toast({
-        title: "Missing fields",
-        description: "Please fill in all required fields (title, URL, and description).",
+        title: "Eksik alanlar",
+        description: "Lütfen tüm gerekli alanları doldurun (başlık, URL ve açıklama).",
         variant: "destructive",
       });
       return;
@@ -47,8 +47,8 @@ export function AddItemDialog({ onAddItem }: AddItemDialogProps) {
       new URL(url);
     } catch {
       toast({
-        title: "Invalid URL",
-        description: "Please enter a valid URL starting with http:// or https://",
+        title: "Geçersiz URL",
+        description: "Lütfen http:// veya https:// ile başlayan geçerli bir URL girin",
         variant: "destructive",
       });
       return;
@@ -73,8 +73,8 @@ export function AddItemDialog({ onAddItem }: AddItemDialogProps) {
     setOpen(false);
 
     toast({
-      title: "Item added!",
-      description: "Your wishlist item has been successfully added.",
+      title: "Ürün eklendi!",
+      description: "İstek listesi ürününüz başarıyla eklendi.",
     });
   };
 
@@ -83,35 +83,35 @@ export function AddItemDialog({ onAddItem }: AddItemDialogProps) {
       <DialogTrigger asChild>
         <Button variant="elegant" className="font-medium">
           <Plus className="h-4 w-4" />
-          Add New Item
+          Yeni Ürün Ekle
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Add to Wishlist</DialogTitle>
+          <DialogTitle>İstek Listesine Ekle</DialogTitle>
           <DialogDescription>
-            Save something you've found online that you love or want to buy.
+            Çevrimiçi bulduğunuz ve sevdiğiniz ya da satın almak istediğiniz bir şeyi kaydedin.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="title">Title *</Label>
+              <Label htmlFor="title">Başlık *</Label>
               <Input
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Item name"
+                placeholder="Ürün adı"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">Kategori</Label>
               <Input
                 id="category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                placeholder="e.g., Tech, Fashion"
+                placeholder="örn., Teknoloji, Moda"
               />
             </div>
           </div>
@@ -130,7 +130,7 @@ export function AddItemDialog({ onAddItem }: AddItemDialogProps) {
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="image">Image URL</Label>
+              <Label htmlFor="image">Resim URL</Label>
               <Input
                 id="image"
                 type="url"
@@ -140,23 +140,23 @@ export function AddItemDialog({ onAddItem }: AddItemDialogProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="price">Price</Label>
+              <Label htmlFor="price">Fiyat</Label>
               <Input
                 id="price"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                placeholder="$99"
+                placeholder="₺99"
               />
             </div>
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="description">Description *</Label>
+            <Label htmlFor="description">Açıklama *</Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Why do you want this? What makes it special?"
+              placeholder="Bunu neden istiyorsunuz? Onu özel kılan nedir?"
               required
               rows={3}
             />
@@ -164,9 +164,9 @@ export function AddItemDialog({ onAddItem }: AddItemDialogProps) {
           
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancel
+              İptal
             </Button>
-            <Button type="submit">Add to Wishlist</Button>
+            <Button type="submit">İstek Listesine Ekle</Button>
           </DialogFooter>
         </form>
       </DialogContent>

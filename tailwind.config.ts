@@ -18,6 +18,9 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'geist': ['Geist', 'sans-serif'],
+			},
 			backgroundImage: {
 				'gradient-subtle': 'var(--gradient-subtle)',
 				'gradient-card': 'var(--gradient-card)'

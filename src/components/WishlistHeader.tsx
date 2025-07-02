@@ -15,12 +15,12 @@ interface WishlistHeaderProps {
 }
 
 const categories: { value: WishlistCategory; label: string }[] = [
-  { value: 'all', label: 'Everything' },
-  { value: 'lifestyle', label: 'Lifestyle' },
-  { value: 'tech', label: 'Tech' },
-  { value: 'home', label: 'Home' },
-  { value: 'fashion', label: 'Fashion' },
-  { value: 'other', label: 'Other' },
+  { value: 'all', label: 'Her Şey' },
+  { value: 'lifestyle', label: 'Yaşam Tarzı' },
+  { value: 'tech', label: 'Teknoloji' },
+  { value: 'home', label: 'Ev' },
+  { value: 'fashion', label: 'Moda' },
+  { value: 'other', label: 'Diğer' },
 ];
 
 export function WishlistHeader({
@@ -38,9 +38,9 @@ export function WishlistHeader({
       {/* Title and Admin Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-light text-foreground">The Inventory</h1>
+          <h1 className="text-2xl font-light text-foreground">Envanter</h1>
           <p className="text-sm text-brand-text mt-1 font-light">
-            {itemCount} {itemCount === 1 ? 'item' : 'items'}
+            {itemCount} {itemCount === 1 ? 'ürün' : 'ürün'}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -52,7 +52,7 @@ export function WishlistHeader({
                 : 'text-brand-text hover:text-foreground hover:bg-brand-subtle'
             }`}
           >
-            {isAdmin ? 'Admin' : 'View Only'}
+            {isAdmin ? 'Yönetici' : 'Sadece Görüntüle'}
           </button>
           {isAdmin && <AddItemDialog onAddItem={onAddItem} />}
         </div>
@@ -79,7 +79,7 @@ export function WishlistHeader({
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-text" />
         <Input
-          placeholder="Search your wishlist..."
+          placeholder="İstek listenizde arayın..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           className="pl-10"

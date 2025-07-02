@@ -57,8 +57,8 @@ const Index = () => {
   const handleDeleteItem = (id: string) => {
     setItems(items.filter(item => item.id !== id));
     toast({
-      title: "Item removed",
-      description: "The item has been removed from your wishlist.",
+      title: "Ürün kaldırıldı",
+      description: "Ürün istek listenizden kaldırıldı.",
     });
   };
 
@@ -100,12 +100,12 @@ const Index = () => {
                 <div className="w-8 h-8 border-2 border-brand-text border-dashed rounded"></div>
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">
-                {searchQuery || selectedCategory !== "all" ? "No items found" : "Start your wishlist"}
+                {searchQuery || selectedCategory !== "all" ? "Ürün bulunamadı" : "İstek listenizi başlatın"}
               </h3>
               <p className="text-brand-text max-w-md mx-auto">
                 {searchQuery || selectedCategory !== "all" 
-                  ? "Try adjusting your search or category filter to find what you're looking for."
-                  : "Save items you love from around the web. Click 'Add New Item' to get started!"
+                  ? "Aradığınızı bulmak için arama veya kategori filtrenizi ayarlamayı deneyin."
+                  : "Web'den sevdiğiniz ürünleri kaydedin. Başlamak için 'Yeni Ürün Ekle'ye tıklayın!"
                 }
               </p>
             </div>
