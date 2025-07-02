@@ -57,91 +57,121 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col items-center justify-center px-4">
-      <div className="mx-auto flex w-full flex-col justify-center space-y-8 sm:w-[420px]">
-        {/* Logo/Brand Section */}
-        <div className="flex flex-col space-y-4 text-center">
-          <div className="mx-auto w-12 h-12 bg-foreground rounded-xl flex items-center justify-center shadow-lg">
-            <span className="text-xl font-bold text-background">W</span>
+    <div className="min-h-screen flex">
+      {/* Left Column - Cover Image */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-subtle relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/30" />
+        <div className="relative z-10 flex flex-col justify-center px-12 text-foreground">
+          <div className="max-w-md">
+            <div className="flex items-center space-x-3 mb-8">
+              <div className="w-10 h-10 bg-foreground rounded-lg flex items-center justify-center">
+                <span className="text-lg font-bold text-background">W</span>
+              </div>
+              <span className="text-2xl font-bold">Wishvue</span>
+            </div>
+            <h2 className="text-4xl font-bold mb-6">
+              Smart wishlist insights for better decisions
+            </h2>
+            <p className="text-lg text-brand-text leading-relaxed">
+              Create beautiful wishlists and get intelligent insights on what to buy next and why. 
+              Track priorities, analyze trends, and make smarter purchasing decisions.
+            </p>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            {isLogin ? 'Welcome back' : 'Create your account'}
-          </h1>
-          <p className="text-brand-text max-w-sm mx-auto">
-            {isLogin 
-              ? 'Sign in to access your wishlists and continue creating'
-              : 'Get started with Wishly and create beautiful wishlists in minutes'
-            }
-          </p>
         </div>
+      </div>
 
-        {/* Auth Form */}
-        <Card className="border-0 shadow-xl bg-card/60 backdrop-blur-sm">
-          <CardContent className="p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {!isLogin && (
+      {/* Right Column - Auth Form */}
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-background">
+        <div className="w-full max-w-md space-y-8">
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex flex-col items-center space-y-4 text-center">
+            <div className="w-12 h-12 bg-foreground rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-xl font-bold text-background">W</span>
+            </div>
+            <span className="text-2xl font-bold text-foreground">Wishvue</span>
+          </div>
+
+          {/* Auth Header */}
+          <div className="text-center lg:text-left">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">
+              {isLogin ? 'Welcome back' : 'Create your account'}
+            </h1>
+            <p className="mt-2 text-brand-text">
+              {isLogin 
+                ? 'Sign in to access your wishlists and insights'
+                : 'Get started with Wishvue and create smart wishlists'
+              }
+            </p>
+          </div>
+
+          {/* Auth Form */}
+          <Card className="border border-card-border shadow-lg">
+            <CardContent className="p-6">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {!isLogin && (
+                  <div className="space-y-2">
+                    <Label htmlFor="displayName" className="text-sm font-medium text-foreground">Name</Label>
+                    <Input
+                      id="displayName"
+                      placeholder="Your full name"
+                      type="text"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      required={!isLogin}
+                      disabled={loading}
+                      className="h-11"
+                    />
+                  </div>
+                )}
                 <div className="space-y-2">
-                  <Label htmlFor="displayName" className="text-sm font-medium text-foreground">Name</Label>
+                  <Label htmlFor="email" className="text-sm font-medium text-foreground">Email</Label>
                   <Input
-                    id="displayName"
-                    placeholder="Your full name"
-                    type="text"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    required={!isLogin}
+                    id="email"
+                    placeholder="name@example.com"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
                     disabled={loading}
-                    className="h-12 rounded-lg border-card-border bg-background/50 focus:bg-background transition-colors"
+                    className="h-11"
                   />
                 </div>
-              )}
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-foreground">Email</Label>
-                <Input
-                  id="email"
-                  placeholder="name@example.com"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-sm font-medium text-foreground">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                    className="h-11"
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 text-base font-medium" 
                   disabled={loading}
-                  className="h-12 rounded-lg border-card-border bg-background/50 focus:bg-background transition-colors"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-foreground">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="h-12 rounded-lg border-card-border bg-background/50 focus:bg-background transition-colors"
-                />
-              </div>
-              <Button 
-                type="submit" 
-                className="w-full h-12 text-base font-medium" 
-                disabled={loading}
-              >
-                {loading ? 'Loading...' : (isLogin ? 'Sign In' : 'Create Account')}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+                >
+                  {loading ? 'Loading...' : (isLogin ? 'Sign In' : 'Create Account')}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
 
-        {/* Switch Mode */}
-        <div className="text-center">
-          <span className="text-sm text-brand-text">
-            {isLogin ? "Don't have an account? " : 'Already have an account? '}
-          </span>
-          <Button
-            variant="link"
-            onClick={() => setIsLogin(!isLogin)}
-            className="p-0 h-auto font-medium text-primary hover:text-primary/80"
-          >
-            {isLogin ? 'Sign up' : 'Sign in'}
-          </Button>
+          {/* Switch Mode */}
+          <div className="text-center">
+            <span className="text-sm text-brand-text">
+              {isLogin ? "Don't have an account? " : 'Already have an account? '}
+            </span>
+            <Button
+              variant="link"
+              onClick={() => setIsLogin(!isLogin)}
+              className="p-0 h-auto font-medium text-primary hover:text-primary/80"
+            >
+              {isLogin ? 'Sign up' : 'Sign in'}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

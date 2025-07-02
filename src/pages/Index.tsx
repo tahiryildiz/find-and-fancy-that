@@ -13,7 +13,7 @@ const Index = () => {
           <div className="w-8 h-8 bg-foreground rounded-lg flex items-center justify-center">
             <span className="text-sm font-bold text-background">W</span>
           </div>
-          <span className="text-xl font-bold text-foreground">Wishly</span>
+          <span className="text-xl font-bold text-foreground">Wishvue</span>
         </div>
         <Button variant="outline" onClick={() => navigate('/auth')}>
           Sign In
@@ -25,18 +25,18 @@ const Index = () => {
         <div className="max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm border border-border rounded-full px-4 py-2 mb-8">
             <Star className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-foreground">Trusted by 10,000+ users worldwide</span>
+            <span className="text-sm font-medium text-foreground">Smart wishlist insights for better decisions</span>
           </div>
           
           <h1 className="text-6xl md:text-7xl font-bold text-foreground mb-6 leading-tight">
-            Create Beautiful
-            <span className="text-primary block">Wishlists</span>
-            in Minutes
+            Smart Wishlist
+            <span className="text-primary block">Dashboard</span>
+            & Insights
           </h1>
           
           <p className="text-xl text-brand-text mb-10 max-w-2xl mx-auto leading-relaxed">
-            Design, customize, and share stunning wishlists with your friends and family. 
-            Get the gifts you actually want with our modern, mobile-friendly platform.
+            Create beautiful wishlists and get intelligent insights on what to buy next and why. 
+            Track priorities, analyze trends, and make smarter purchasing decisions.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -54,7 +54,7 @@ const Index = () => {
       {/* Features Section */}
       <div className="container mx-auto px-6 py-20">
         <h2 className="text-3xl font-bold text-center text-foreground mb-16">
-          Everything you need to create amazing wishlists
+          Everything you need for smart wishlist management
         </h2>
         
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -62,9 +62,9 @@ const Index = () => {
             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6">
               <Palette className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-4">Fully Customizable</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-4">Smart Analytics</h3>
             <p className="text-brand-text leading-relaxed">
-              Choose colors, upload logos, and customize every detail to match your style and personality.
+              Get insights on your wishlist trends, priority scoring, and intelligent recommendations for what to buy next.
             </p>
           </div>
           
@@ -72,9 +72,9 @@ const Index = () => {
             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6">
               <Share2 className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-4">Easy Sharing</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-4">Dashboard Insights</h3>
             <p className="text-brand-text leading-relaxed">
-              Share your wishlist with a simple link. No accounts required for your friends and family.
+              Visual dashboard showing purchase priorities, budget tracking, and decision-making insights.
             </p>
           </div>
           
@@ -82,9 +82,9 @@ const Index = () => {
             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6">
               <Users className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-4">Interactive</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-4">Easy Sharing</h3>
             <p className="text-brand-text leading-relaxed">
-              Friends can like and react to items, helping you prioritize what you want most.
+              Share your wishlist with a simple link. Friends can interact and help you prioritize decisions.
             </p>
           </div>
         </div>
@@ -97,7 +97,7 @@ const Index = () => {
             Ready to create your first wishlist?
           </h2>
           <p className="text-xl text-brand-text mb-8">
-            Join thousands of users who have already created beautiful, personalized wishlists.
+            Start making smarter purchasing decisions with intelligent wishlist insights.
           </p>
           <Button size="lg" onClick={() => navigate('/auth')} className="text-lg px-8 py-4 h-14">
             Get Started - It's Free
