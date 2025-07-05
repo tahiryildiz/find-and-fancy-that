@@ -209,11 +209,20 @@ export default function Dashboard() {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      onClick={() => viewWishlist(wishlist.slug)}
+                      onClick={() => navigate(`/w/${wishlist.slug}`)}
                       className="flex-1 gap-2 hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-all"
                     >
                       <Eye className="w-4 h-4" />
-                      {wishlist.item_count === 0 ? 'Manage' : 'View'}
+                      View
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => navigate(`/manage/${wishlist.slug}`)}
+                      className="flex-1 gap-2 hover:bg-accent/10 hover:text-accent hover:border-accent/30 transition-all"
+                    >
+                      <Settings className="w-4 h-4" />
+                      Manage
                     </Button>
                     <Button 
                       variant="outline" 
