@@ -1,85 +1,89 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Wishlist, Category, Item } from '@/types/database';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { 
-  Plus, 
-  ArrowLeft, 
-  Heart, 
-  ThumbsUp, 
-  ExternalLink, 
-  Edit, 
-  Trash2, 
-  ArrowDownAZ, 
-  Calendar, 
-  SortAsc, 
-  SortDesc,
-  Share2,
-  Mail,
-  Link,
-  Pencil,
-  Tags,
-  Upload,
-  X,
-  LinkIcon
-} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { PlusCircle, X, Pencil, Trash2, Share, ExternalLink, Search, ChevronDown } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+
+type ItemFormType = {
+  id: string;
+  title: string;
+  description: string;
+  url: string;
+  image_url: string;
+  price: string;
+  brand: string;
+  category_id: string;
+};
+
+type CategoryFormType = {
+  id: string;
+  name: string;
+};
+
+interface Wishlist {
+  id: string;
+  title: string;
+  description?: string;
+  slug: string;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+  is_public: boolean;
+  background_color?: string;
+  font_family?: string;
+  language?: string;
+  logo_url?: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  wishlist_id: string;
+  created_at: string;
+}
+
+interface Item {
+  id: string;
+  title: string;
+  description: string;
+  url: string;
+  image_url: string;
+  price: string;
+  brand: string;
+  category_id: string;
+  wishlist_id: string;
+  created_at: string;
+}
 
 export default function WishlistManagement() {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { toast } = useToast();
-  
-  // State for wishlist data
-  const [loading, setLoading] = useState<boolean>(true);
+
+  // Main data state
+  const [loading, setLoading] = useState(true);
   const [wishlist, setWishlist] = useState<Wishlist | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
-  // State for filtering and sorting
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [sortBy, setSortBy] = useState<string>('date');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  // Modal state
+  const [addItemOpen, setAddItemOpen] = useState(false);
+  const [manageCategoriesOpen, setManageCategoriesOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<string | null>(null);
 
-  // State for item form
-  const [addItemOpen, setAddItemOpen] = useState<boolean>(false);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [itemForm, setItemForm] = useState<{
-    id: string;
-    title: string;
-    description: string;
-    url: string;
-    image_url: string;
-    price: string;
-    brand: string;
-    category_id: string | null;
-  }>({
+  // Form state
+  const [itemForm, setItemForm] = useState<ItemFormType>({
     id: '',
     title: '',
     description: '',
@@ -89,20 +93,27 @@ export default function WishlistManagement() {
     brand: '',
     category_id: 'none'
   });
+  const [categoryForm, setCategoryForm] = useState<CategoryFormType>({
+    id: '',
+    name: ''
+  });
 
-  // State for category management
-  const [categoryModalOpen, setCategoryModalOpen] = useState<boolean>(false);
-  const [categoryForm, setCategoryForm] = useState<{ id: string; name: string }>({ id: '', name: '' });
-  const [editingCategory, setEditingCategory] = useState<string | null>(null);
+  // Search and sort state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState<'title' | 'date' | 'price'>('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  // Load data on component mount
+  // Image upload state
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   useEffect(() => {
-    if (slug && user) {
+    if (slug) {
       fetchWishlistData();
     }
-  }, [slug, user]);
+  }, [slug]);
 
-  // Function to reset item form to default values
+  // Reset functions
   const resetItemForm = () => {
     setItemForm({
       id: '',
@@ -115,15 +126,24 @@ export default function WishlistManagement() {
       category_id: 'none'
     });
     setIsEditing(false);
+    setImageFile(null);
+    setImagePreview(null);
   };
 
-  // Function continues in part 2...
-}
-  // Fetch wishlist data from Supabase
+  const resetCategoryForm = () => {
+    setCategoryForm({
+      id: '',
+      name: ''
+    });
+    setEditingCategory(null);
+  };
+
+  // Main data fetching
   const fetchWishlistData = async () => {
-    setLoading(true);
     try {
-      // Fetch the wishlist
+      setLoading(true);
+      
+      // Get wishlist
       const { data: wishlistData, error: wishlistError } = await supabase
         .from('wishlists')
         .select('*')
@@ -132,13 +152,13 @@ export default function WishlistManagement() {
       
       if (wishlistError) throw wishlistError;
       if (!wishlistData) {
-        setLoading(false);
+        navigate('/not-found');
         return;
       }
       
       setWishlist(wishlistData);
       
-      // Fetch items for this wishlist
+      // Get items
       const { data: itemsData, error: itemsError } = await supabase
         .from('items')
         .select('*')
@@ -148,136 +168,63 @@ export default function WishlistManagement() {
       if (itemsError) throw itemsError;
       setItems(itemsData || []);
       
-      // Fetch categories for this wishlist
-      try {
-        const { data: categoriesData, error: categoriesError } = await supabase
-          .from('categories')
-          .select('*')
-          .eq('wishlist_id', wishlistData.id)
-          .order('name');
-        
-        if (categoriesError) throw categoriesError;
-        console.log('Fetched categories:', categoriesData);
-        setCategories(categoriesData || []);
-      } catch (categoryError) {
-        console.error('Error fetching categories:', categoryError);
-      }
+      // Get categories
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('wishlist_id', wishlistData.id)
+        .order('name');
+      
+      if (categoriesError) throw categoriesError;
+      setCategories(categoriesData || []);
+      
     } catch (error) {
-      console.error('Error fetching wishlist data:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load wishlist data",
-        variant: "destructive",
+      toast({ 
+        title: "Error loading wishlist", 
+        description: "Failed to load wishlist data. Please try again.", 
+        variant: "destructive" 
       });
+      console.error("Error fetching wishlist data:", error);
     } finally {
       setLoading(false);
     }
   };
-
-  // Function to fetch categories (centralized for reuse)
-  const fetchCategories = async () => {
-    try {
-      console.log('Fetching categories for wishlist ID:', wishlist?.id);
-      
-      if (!wishlist?.id) {
-        console.error('Cannot fetch categories: wishlist ID is undefined');
-        return;
-      }
-      
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('wishlist_id', wishlist.id)
-        .order('name');
-      
-      if (error) throw error;
-      console.log('Fetched categories:', data);
-      setCategories(data || []);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load categories",
-        variant: "destructive"
-      });
+  // Item CRUD operations
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setImagePreview(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  // Handle file selection for image upload
-  const handleImageFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    
-    // Validate file type and size
-    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!validImageTypes.includes(file.type)) {
-      toast({
-        title: "Invalid file type",
-        description: "Please upload an image file (JPEG, PNG, GIF, WEBP)",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit
-      toast({
-        title: "File too large",
-        description: "File size should be less than 5MB",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    // Display preview immediately before upload completes
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setItemForm(prev => ({
-        ...prev,
-        image_url: e.target && e.target.result ? e.target.result.toString() : ''
-      }));
-    };
-    reader.readAsDataURL(file);
-    
-    // Upload to Supabase Storage
+  const uploadImage = async (file: File): Promise<string> => {
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${wishlist!.id}/${Date.now()}.${fileExt}`;
-      
-      const { data: uploadData, error } = await supabase.storage
-        .from('images')
+      const fileName = `${wishlist!.id}/${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const { error: uploadError, data } = await supabase.storage
+        .from('item-images')
         .upload(fileName, file);
-        
-      if (error) throw error;
+
+      if (uploadError) throw uploadError;
       
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('images')
-        .getPublicUrl(uploadData.path);
-        
-      // Update form with uploaded image URL
-      setItemForm(prev => ({
-        ...prev,
-        image_url: urlData.publicUrl
-      }));
+      const { data: { publicUrl } } = supabase.storage
+        .from('item-images')
+        .getPublicUrl(fileName);
       
-      toast({
-        title: "Image uploaded",
-        description: "Your image has been uploaded successfully"
-      });
+      return publicUrl;
     } catch (error) {
       console.error('Error uploading image:', error);
-      toast({
-        title: "Upload failed",
-        description: "Image upload failed, but preview is available",
-        variant: "destructive"
-      });
+      throw new Error('Failed to upload image');
     }
   };
 
-  // Handle saving an item (add or update)
   const handleSaveItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!itemForm.title) {
       toast({ 
         title: "Missing information", 
@@ -288,6 +235,13 @@ export default function WishlistManagement() {
     }
     
     try {
+      let imageUrl = itemForm.image_url;
+      
+      // Upload image if there's a new file
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile);
+      }
+      
       if (isEditing) {
         // Update existing item
         const { error } = await supabase
@@ -296,26 +250,25 @@ export default function WishlistManagement() {
             title: itemForm.title,
             description: itemForm.description,
             url: itemForm.url,
-            image_url: itemForm.image_url,
+            image_url: imageUrl,
             price: itemForm.price,
             brand: itemForm.brand,
             category_id: itemForm.category_id === 'none' ? null : itemForm.category_id,
-            updated_at: new Date().toISOString()
           })
           .eq('id', itemForm.id);
         
         if (error) throw error;
         
-        // Update the items list
-        setItems(prevItems => 
-          prevItems.map(item => 
-            item.id === itemForm.id ? {...item, ...itemForm} : item
-          )
-        );
+        // Update local state
+        setItems(prevItems => prevItems.map(item => 
+          item.id === itemForm.id ? 
+            {...item, ...itemForm, image_url: imageUrl, category_id: itemForm.category_id === 'none' ? null : itemForm.category_id} : 
+            item
+        ));
         
-        toast({
-          title: "Item updated",
-          description: "Item has been updated successfully"
+        toast({ 
+          title: "Item updated", 
+          description: "Item has been updated successfully" 
         });
       } else {
         // Add new item
@@ -326,47 +279,41 @@ export default function WishlistManagement() {
             title: itemForm.title,
             description: itemForm.description,
             url: itemForm.url,
-            image_url: itemForm.image_url,
+            image_url: imageUrl,
             price: itemForm.price,
             brand: itemForm.brand,
             category_id: itemForm.category_id === 'none' ? null : itemForm.category_id,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
           }])
           .select()
           .single();
         
         if (error) throw error;
         
-        // Update the items list
-        setItems(prevItems => [...prevItems, data]);
+        // Update local state
+        setItems(prevItems => [data, ...prevItems]);
         
-        toast({
-          title: "Item added",
-          description: "New item added to your wishlist"
+        toast({ 
+          title: "Item added", 
+          description: "New item added to your wishlist" 
         });
       }
       
-      // Clear the form and reset editing state
+      // Reset form and close modal
       resetItemForm();
-      
-      // Close the dialog
       setAddItemOpen(false);
       
     } catch (error) {
       console.error('Error saving item:', error);
-      toast({
-        title: "Error",
-        description: `Failed to ${isEditing ? 'update' : 'add'} item`,
-        variant: "destructive"
+      toast({ 
+        title: "Error", 
+        description: `Failed to ${isEditing ? 'update' : 'add'} item`, 
+        variant: "destructive" 
       });
     }
   };
 
-  // Handle deleting an item
   const handleDeleteItem = async (itemId: string) => {
     const confirmed = window.confirm('Are you sure you want to delete this item?');
-    
     if (!confirmed) return;
     
     try {
@@ -374,44 +321,53 @@ export default function WishlistManagement() {
         .from('items')
         .delete()
         .eq('id', itemId);
-        
+      
       if (error) throw error;
       
-      // Remove from UI
+      // Update local state
       setItems(prev => prev.filter(i => i.id !== itemId));
       
-      toast({
-        title: "Item deleted",
-        description: "Item has been removed from your wishlist"
+      toast({ 
+        title: "Item deleted", 
+        description: "Item has been removed from your wishlist" 
       });
     } catch (error) {
       console.error('Error deleting item:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete item",
-        variant: "destructive"
+      toast({ 
+        title: "Error", 
+        description: "Failed to delete item", 
+        variant: "destructive" 
       });
     }
   };
 
-  // Handle editing a category
-  const handleEditCategory = (category: Category) => {
-    setCategoryForm({
-      id: category.id,
-      name: category.name
+  const handleEditItem = (item: Item) => {
+    setItemForm({
+      id: item.id,
+      title: item.title,
+      description: item.description || '',
+      url: item.url || '',
+      image_url: item.image_url || '',
+      price: item.price || '',
+      brand: item.brand || '',
+      category_id: item.category_id || 'none'
     });
-    setEditingCategory(category.id);
+    setIsEditing(true);
+    setAddItemOpen(true);
+    // Set image preview if there's an image URL
+    if (item.image_url) {
+      setImagePreview(item.image_url);
+    }
   };
 
-  // Handle saving a category (add or update)
-  const handleCategorySave = async (e: React.FormEvent) => {
+  // Category CRUD operations
+  const handleSaveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!categoryForm.name.trim()) {
-      toast({
-        title: "Missing information",
-        description: "Please provide a name for the category",
-        variant: "destructive"
+      toast({ 
+        title: "Missing information", 
+        description: "Please provide a category name", 
+        variant: "destructive" 
       });
       return;
     }
@@ -421,621 +377,599 @@ export default function WishlistManagement() {
         // Update existing category
         const { error } = await supabase
           .from('categories')
-          .update({ name: categoryForm.name.trim() })
-          .eq('id', categoryForm.id);
+          .update({ 
+            name: categoryForm.name.trim() 
+          })
+          .eq('id', editingCategory);
         
         if (error) throw error;
         
-        toast({
-          title: "Category updated",
-          description: `Category "${categoryForm.name}" has been updated`
+        // Update local state
+        setCategories(prevCategories => 
+          prevCategories.map(cat => 
+            cat.id === editingCategory ? 
+              { ...cat, name: categoryForm.name.trim() } : 
+              cat
+          )
+        );
+        
+        toast({ 
+          title: "Category updated", 
+          description: "Category has been updated successfully" 
         });
       } else {
         // Add new category
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('categories')
           .insert([{
             wishlist_id: wishlist!.id,
-            name: categoryForm.name.trim()
+            name: categoryForm.name.trim(),
+            slug: categoryForm.name.trim().toLowerCase().replace(/\s+/g, '-')
           }])
-          .select();
+          .select()
+          .single();
         
         if (error) throw error;
         
-        toast({
-          title: "Category added",
-          description: `Category "${categoryForm.name}" has been added`
+        // Update local state
+        setCategories(prevCategories => [...prevCategories, data]);
+        
+        toast({ 
+          title: "Category added", 
+          description: "New category added to your wishlist" 
         });
       }
       
-      // Reset form but don't close modal, so user can add multiple categories
-      setCategoryForm({ id: '', name: '' });
-      setEditingCategory(null);
+      // Reset form
+      resetCategoryForm();
       
-      // Refresh categories list
-      await fetchCategories();
     } catch (error) {
       console.error('Error saving category:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save category",
-        variant: "destructive"
+      toast({ 
+        title: "Error", 
+        description: `Failed to ${editingCategory ? 'update' : 'add'} category`, 
+        variant: "destructive" 
       });
     }
   };
 
-  // Handle deleting a category
   const handleDeleteCategory = async (categoryId: string) => {
-    const confirmed = window.confirm('Are you sure you want to delete this category? Items in this category will not be deleted, but will no longer have a category assigned.');
-    
+    const confirmed = window.confirm('Are you sure you want to delete this category? Items in this category will be uncategorized.');
     if (!confirmed) return;
     
     try {
-      // First, update all items that use this category to have no category
-      const { error: updateError } = await supabase
+      // First update items to remove category association
+      const { error: itemsError } = await supabase
         .from('items')
         .update({ category_id: null })
         .eq('category_id', categoryId);
       
-      if (updateError) throw updateError;
+      if (itemsError) throw itemsError;
       
       // Then delete the category
-      const { error } = await supabase
+      const { error: categoryError } = await supabase
         .from('categories')
         .delete()
         .eq('id', categoryId);
       
-      if (error) throw error;
+      if (categoryError) throw categoryError;
       
-      toast({
-        title: "Category deleted",
-        description: "Category and its associations have been removed"
-      });
+      // Update local state
+      setCategories(prev => prev.filter(c => c.id !== categoryId));
+      setItems(prev => prev.map(item => 
+        item.category_id === categoryId ? { ...item, category_id: null } : item
+      ));
       
-      // Reset form if we were editing the deleted category
       if (editingCategory === categoryId) {
-        setCategoryForm({ id: '', name: '' });
-        setEditingCategory(null);
+        resetCategoryForm();
       }
       
-      // Refresh categories list
-      await fetchCategories();
+      toast({ 
+        title: "Category deleted", 
+        description: "Category has been removed from your wishlist" 
+      });
       
-      // Also refresh items to update their display
-      fetchWishlistData();
     } catch (error) {
       console.error('Error deleting category:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete category",
-        variant: "destructive"
+      toast({ 
+        title: "Error", 
+        description: "Failed to delete category", 
+        variant: "destructive" 
       });
     }
   };
 
-  // Share wishlist via email
-  const handleShareViaEmail = () => {
+  const handleEditCategory = (category: Category) => {
+    setCategoryForm({
+      id: category.id,
+      name: category.name
+    });
+    setEditingCategory(category.id);
+  };
+
+  // Share functions
+  const handleShareLink = () => {
     if (!wishlist) return;
     
-    const subject = encodeURIComponent(`Check out my wishlist: ${wishlist.title}`);
-    const body = encodeURIComponent(`Here's my wishlist "${wishlist.title}":\n\n${window.location.origin}/wishlist/${wishlist.slug}\n\nEnjoy!`);
-    
-    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
-    
-    toast({
-      title: "Share initiated",
-      description: "Your email client should open with the wishlist link"
+    const shareUrl = `${window.location.origin}/wishlist/${wishlist.slug}`;
+    navigator.clipboard.writeText(shareUrl);
+    toast({ 
+      title: "Link copied", 
+      description: "Wishlist link copied to clipboard" 
     });
   };
 
-  // Copy wishlist link to clipboard
-  const handleCopyLink = () => {
+  const handleShareEmail = () => {
     if (!wishlist) return;
     
-    const link = `${window.location.origin}/wishlist/${wishlist.slug}`;
-    navigator.clipboard.writeText(link);
+    const shareUrl = `${window.location.origin}/wishlist/${wishlist.slug}`;
+    const subject = `Check out my wishlist: ${wishlist.title}`;
+    const body = `I wanted to share my wishlist "${wishlist.title}" with you. You can view it here: ${shareUrl}`;
     
-    toast({
-      title: "Link copied",
-      description: "Wishlist link copied to clipboard"
-    });
+    window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
-  // Filter items by category and search term
+  // Derived data
   const filteredItems = useMemo(() => {
-    return items.filter(item => {
-      // Category filter
-      const categoryMatches = categoryFilter === null || item.category_id === categoryFilter;
-      
-      // Search term filter
-      const searchTermLower = searchTerm.toLowerCase();
-      const searchMatches = searchTerm === '' || 
-        item.title?.toLowerCase().includes(searchTermLower) ||
-        item.description?.toLowerCase().includes(searchTermLower) ||
-        item.brand?.toLowerCase().includes(searchTermLower);
-      
-      return categoryMatches && searchMatches;
-    }).sort((a, b) => {
-      // Sort by selected field
+    let result = [...items];
+    
+    // Apply category filter
+    if (categoryFilter !== 'all') {
+      result = result.filter(item => item.category_id === categoryFilter);
+    }
+    
+    // Apply search filter
+    if (searchTerm.trim() !== '') {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(item => 
+        (item.title && item.title.toLowerCase().includes(term)) || 
+        (item.description && item.description.toLowerCase().includes(term)) ||
+        (item.brand && item.brand.toLowerCase().includes(term))
+      );
+    }
+    
+    // Apply sorting
+    result.sort((a, b) => {
       if (sortBy === 'title') {
-        return sortOrder === 'asc'
-          ? (a.title || '').localeCompare(b.title || '')
-          : (b.title || '').localeCompare(a.title || '');
-      } else if (sortBy === 'date') {
-        const dateA = new Date(a.updated_at || a.created_at).getTime();
-        const dateB = new Date(b.updated_at || b.created_at).getTime();
-        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+        return (a.title || '').localeCompare(b.title || '') * (sortOrder === 'asc' ? 1 : -1);
+      } else if (sortBy === 'price') {
+        const priceA = a.price ? parseFloat(a.price) : 0;
+        const priceB = b.price ? parseFloat(b.price) : 0;
+        return (priceA - priceB) * (sortOrder === 'asc' ? 1 : -1);
+      } else { // date
+        return (new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) * (sortOrder === 'asc' ? 1 : -1);
       }
-      return 0;
     });
+    
+    return result;
   }, [items, categoryFilter, searchTerm, sortBy, sortOrder]);
 
-  // Get categories that have items
-  const activeCategories = useMemo(() => {
-    const categoryIds = new Set(items.map(item => item.category_id).filter(Boolean));
-    return categories.filter(category => categoryIds.has(category.id));
-  }, [categories, items]);
+  // Category IDs with at least one item
+  const categoryIds = useMemo(() => {
+    const ids = new Set(items.filter(item => item.category_id).map(item => item.category_id));
+    return Array.from(ids);
+  }, [items]);
 
-  // Render the component
+  // Only show categories that have at least one item
+  const activeCategories = useMemo(() => {
+    return categories.filter(cat => categoryIds.includes(cat.id));
+  }, [categories, categoryIds]);
+
+  if (loading) {
+    return (
+      <div className="container py-10 text-center">
+        <p>Loading wishlist...</p>
+      </div>
+    );
+  }
+
+  if (!wishlist) {
+    return (
+      <div className="container py-10 text-center">
+        <p>Wishlist not found</p>
+        <Button onClick={() => navigate('/')} className="mt-4">Go Home</Button>
+      </div>
+    );
+  }
+
   return (
-    <div className="container py-8">
-      {loading ? (
-        <div className="flex justify-center items-center min-h-[60vh]">
-          <p>Loading...</p>
+    <div className="container py-6">
+      {/* Header */}
+      <div className="flex flex-wrap justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">{wishlist.title}</h1>
+        <div className="flex items-center gap-2">
+          <Button 
+            onClick={() => {
+              resetItemForm();
+              setAddItemOpen(true);
+            }}
+            className="flex items-center gap-2"
+          >
+            <PlusCircle size={16} /> Add Item
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Share size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleShareLink}>
+                Copy Link
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleShareEmail}>
+                Share by Email
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-      ) : (
-        <main>
-          {/* Back button and header */}
-          <div className="mb-6">
+
+        {/* Categories */}
+        <div className="w-full mt-4">
+          <div className="flex flex-wrap gap-2 mb-4">
+            <Badge
+              key="all"
+              variant={categoryFilter === 'all' ? "default" : "outline"}
+              className="cursor-pointer"
+              onClick={() => setCategoryFilter('all')}
+            >
+              All Items
+            </Badge>
+            {activeCategories.map(cat => (
+              <Badge
+                key={cat.id}
+                variant={categoryFilter === cat.id ? "default" : "outline"}
+                className="cursor-pointer"
+                onClick={() => setCategoryFilter(cat.id)}
+              >
+                {cat.name}
+              </Badge>
+            ))}
             <Button 
               variant="ghost" 
-              size="sm"
-              onClick={() => navigate('/dashboard')}
-              className="mb-4"
+              size="sm" 
+              onClick={() => setManageCategoriesOpen(true)}
+              className="ml-2"
             >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+              Manage Categories
             </Button>
-            
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-              <h1 className="text-3xl font-bold">{wishlist?.title}</h1>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Share
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={handleCopyLink}>
-                    <Link className="mr-2 h-4 w-4" />
-                    Copy Link
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleShareViaEmail}>
-                    <Mail className="mr-2 h-4 w-4" />
-                    Share via Email
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            
-            {/* Category filters */}
-            {activeCategories.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-6">
-                <Button
-                  size="sm"
-                  variant={categoryFilter === null ? "default" : "outline"}
-                  onClick={() => setCategoryFilter(null)}
+          </div>
+        </div>
+      </div>
+
+      {/* Search and sort */}
+      <div className="flex flex-wrap gap-4 mb-6">
+        <div className="relative flex-grow max-w-md">
+          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" size={16} />
+          <Input
+            placeholder="Search items..."
+            className="pl-8"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="flex gap-2">
+          <Select value={sortBy} onValueChange={(value) => setSortBy(value as any)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="date">Date Added</SelectItem>
+              <SelectItem value="title">Title</SelectItem>
+              <SelectItem value="price">Price</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+          >
+            <ChevronDown className={sortOrder === 'asc' ? 'transform rotate-180' : ''} size={16} />
+          </Button>
+        </div>
+      </div>
+
+      {/* Items grid */}
+      {filteredItems.length === 0 ? (
+        <div className="text-center py-10">
+          <p className="text-gray-500">
+            {searchTerm || categoryFilter !== 'all' ? 
+              "No items match your filters" : 
+              "No items yet. Add your first item using the button above."
+            }
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredItems.map(item => {
+            const category = categories.find(c => c.id === item.category_id);
+            return (
+              <Card key={item.id} className="overflow-hidden">
+                <div 
+                  className="relative h-48 bg-gray-100 cursor-pointer" 
+                  onClick={() => item.url && window.open(item.url, '_blank')}
                 >
-                  All
-                </Button>
-                
-                {activeCategories.map(category => (
-                  <Button
-                    key={category.id}
-                    size="sm"
-                    variant={categoryFilter === category.id ? "default" : "outline"}
-                    onClick={() => setCategoryFilter(category.id)}
-                  >
-                    {category.name}
-                  </Button>
-                ))}
-                
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setCategoryModalOpen(true)}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
-            
-            {/* Search and sort controls */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-4">
-              <div className="flex-1">
-                <Input
-                  placeholder="Search items..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full"
+                  {item.image_url ? (
+                    <img 
+                      src={item.image_url} 
+                      alt={item.title} 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      No Image
+                    </div>
+                  )}
+                  {item.url && (
+                    <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
+                      <ExternalLink size={16} />
+                    </div>
+                  )}
+                </div>
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-semibold line-clamp-2">{item.title}</h3>
+                    <div className="flex gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditItem(item);
+                        }}
+                      >
+                        <Pencil size={16} />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-red-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteItem(item.id);
+                        }}
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
+                  </div>
+                  {item.description && (
+                    <p className="text-gray-600 text-sm line-clamp-2 mb-2">{item.description}</p>
+                  )}
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {item.price && (
+                      <Badge variant="secondary">${item.price}</Badge>
+                    )}
+                    {item.brand && (
+                      <Badge variant="outline">{item.brand}</Badge>
+                    )}
+                    {category && (
+                      <Badge variant="outline" className="bg-gray-100">{category.name}</Badge>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Add/Edit Item Modal */}
+      <Dialog 
+        open={addItemOpen} 
+        onOpenChange={(open) => {
+          if (!open) {
+            setAddItemOpen(false);
+            resetItemForm();
+          }
+        }}
+      >
+        <DialogContent className="max-w-md" onInteractOutside={(e) => e.preventDefault()}>
+          <DialogHeader>
+            <DialogTitle>{isEditing ? 'Edit Item' : 'Add New Item'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSaveItem}>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="title" className="block text-sm font-medium mb-1">Title *</label>
+                <Input 
+                  id="title" 
+                  value={itemForm.title} 
+                  onChange={(e) => setItemForm({...itemForm, title: e.target.value})}
+                  placeholder="Item title"
+                  required
                 />
               </div>
-              
-              <div className="flex gap-2">
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-[120px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="date">Date</SelectItem>
-                    <SelectItem value="title">Title</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setSortOrder(order => (order === 'asc' ? 'desc' : 'asc'))}
-                >
-                  {sortOrder === 'asc' ? <SortAsc /> : <SortDesc />}
-                </Button>
-                
-                <Button onClick={() => {
-                  resetItemForm();
-                  setAddItemOpen(true);
-                }}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Item
-                </Button>
+              <div>
+                <label htmlFor="description" className="block text-sm font-medium mb-1">Description</label>
+                <Textarea 
+                  id="description" 
+                  value={itemForm.description} 
+                  onChange={(e) => setItemForm({...itemForm, description: e.target.value})}
+                  placeholder="Item description"
+                  rows={3}
+                />
               </div>
-            </div>
-          </div>
-          
-          {/* Main content */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredItems.length === 0 ? (
-              <div className="col-span-full text-center py-12">
-                <p className="text-muted-foreground">No items found.</p>
-                <Button 
-                  onClick={() => {
-                    resetItemForm();
-                    setAddItemOpen(true);
-                  }}
-                  className="mt-4"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add your first item
-                </Button>
+              <div>
+                <label htmlFor="url" className="block text-sm font-medium mb-1">URL</label>
+                <Input 
+                  id="url" 
+                  type="url"
+                  value={itemForm.url} 
+                  onChange={(e) => setItemForm({...itemForm, url: e.target.value})}
+                  placeholder="https://example.com/item"
+                />
               </div>
-            ) : (
-              <>
-                {filteredItems.map((item) => (
-                  <div key={item.id} className="col-span-1">
-                    <Card 
-                      className="h-full cursor-pointer hover:shadow-md transition-all" 
-                      onClick={() => {
-                        if (item.url) {
-                          window.open(item.url, '_blank');
-                        }
-                      }}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h3 className="font-medium">{item.title}</h3>
-                          </div>
-                          <div className="flex space-x-1">
-                            <Button
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-8 w-8 p-0"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setItemForm({
-                                  id: item.id,
-                                  title: item.title,
-                                  description: item.description,
-                                  url: item.url,
-                                  image_url: item.image_url,
-                                  price: item.price,
-                                  brand: item.brand,
-                                  category_id: item.category_id || 'none'
-                                });
-                                setIsEditing(true);
-                                setAddItemOpen(true);
-                              }}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-8 w-8 p-0"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleDeleteItem(item.id);
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </div>
-                        </div>
-                        
-                        {item.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-3 mb-2">
-                            {item.description}
-                          </p>
-                        )}
-                        
-                        {item.image_url && (
-                          <div className="relative mb-2 aspect-video">
-                            <img 
-                              src={item.image_url} 
-                              alt={item.title} 
-                              className="rounded-md object-cover h-full w-full"
-                            />
-                          </div>
-                        )}
-                        
-                        <div className="flex flex-wrap gap-2 mb-2">
-                          {item.category_id && categories.find(c => c.id === item.category_id) && (
-                            <Badge variant="secondary" className="text-xs">
-                              <Tags className="h-3 w-3 mr-1" />
-                              {categories.find(c => c.id === item.category_id)?.name}
-                            </Badge>
-                          )}
-                          
-                          {item.brand && (
-                            <Badge variant="outline" className="text-xs bg-blue-50">
-                              {item.brand}
-                            </Badge>
-                          )}
-
-                          {item.price && (
-                            <Badge variant="outline" className="text-xs">
-                              {item.price}
-                            </Badge>
-                          )}
-                        </div>
-                        
-                        {item.url && (
-                          <div className="flex justify-start items-center mt-2">
-                            <div className="flex items-center text-xs text-blue-600">
-                              <ExternalLink className="h-3 w-3 mr-1" /> Visit
-                            </div>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </div>
-                ))}
-              </>
-            )}
-          </div>
-          
-          {/* Add/Edit Item Dialog */}
-          <Dialog 
-            open={addItemOpen} 
-            onOpenChange={(open) => {
-              if (!open) {
-                // Reset form when dialog is closed
-                resetItemForm();
-              }
-              setAddItemOpen(open);
-            }}
-            onInteractOutside={(e) => {
-              // Prevent closing when clicking outside
-              e.preventDefault();
-            }}
-          >
-            <DialogContent className="sm:max-w-[600px]">
-              <DialogHeader>
-                <DialogTitle>{isEditing ? 'Edit Item' : 'Add New Item'}</DialogTitle>
-                <DialogDescription>
-                  {isEditing ? 'Update item details' : 'Add a new item to your wishlist'}
-                </DialogDescription>
-              </DialogHeader>
-              
-              <form onSubmit={handleSaveItem} className="space-y-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="title">Title</Label>
+              <div>
+                <label htmlFor="image" className="block text-sm font-medium mb-1">Image</label>
+                <div className="space-y-2">
+                  {imagePreview && (
+                    <div className="relative h-40 w-full">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 h-6 w-6"
+                        onClick={() => {
+                          setImagePreview(null);
+                          setImageFile(null);
+                          setItemForm({...itemForm, image_url: ''});
+                        }}
+                      >
+                        <X size={12} />
+                      </Button>
+                    </div>
+                  )}
                   <Input 
-                    id="title" 
-                    value={itemForm.title}
-                    onChange={(e) => setItemForm({...itemForm, title: e.target.value})}
-                    placeholder="Item name"
+                    id="image" 
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="cursor-pointer"
+                  />
+                  <p className="text-xs text-gray-500">Or enter image URL directly:</p>
+                  <Input
+                    value={itemForm.image_url}
+                    onChange={(e) => setItemForm({...itemForm, image_url: e.target.value})}
+                    placeholder="https://example.com/image.jpg"
                   />
                 </div>
-                
-                <div className="grid gap-2">
-                  <Label htmlFor="description">Description (optional)</Label>
-                  <Textarea 
-                    id="description" 
-                    value={itemForm.description}
-                    onChange={(e) => setItemForm({...itemForm, description: e.target.value})}
-                    placeholder="Describe the item"
-                    rows={3}
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label htmlFor="price" className="block text-sm font-medium mb-1">Price</label>
+                  <Input 
+                    id="price" 
+                    value={itemForm.price} 
+                    onChange={(e) => setItemForm({...itemForm, price: e.target.value})}
+                    placeholder="19.99"
                   />
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="url">URL (optional)</Label>
-                    <Input 
-                      id="url" 
-                      type="url"
-                      value={itemForm.url}
-                      onChange={(e) => setItemForm({...itemForm, url: e.target.value})}
-                      placeholder="https://"
-                    />
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="price">Price (optional)</Label>
-                    <Input 
-                      id="price" 
-                      value={itemForm.price}
-                      onChange={(e) => setItemForm({...itemForm, price: e.target.value})}
-                      placeholder="$99.99"
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid gap-2">
-                  <Label htmlFor="brand">Brand (optional)</Label>
+                <div className="flex-1">
+                  <label htmlFor="brand" className="block text-sm font-medium mb-1">Brand</label>
                   <Input 
                     id="brand" 
-                    value={itemForm.brand}
+                    value={itemForm.brand} 
                     onChange={(e) => setItemForm({...itemForm, brand: e.target.value})}
                     placeholder="Brand name"
                   />
                 </div>
-                
-                <div className="grid gap-2">
-                  <Label htmlFor="category">Category (optional)</Label>
-                  <Select 
-                    value={itemForm.category_id || 'none'} 
-                    onValueChange={(value) => setItemForm({...itemForm, category_id: value === 'none' ? null : value})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="grid gap-2">
-                  <Label htmlFor="image">Image (optional)</Label>
-                  <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-md p-4 relative">
-                    {itemForm.image_url ? (
-                      <div className="relative w-full">
-                        <img 
-                          src={itemForm.image_url} 
-                          alt="Preview" 
-                          className="mx-auto max-h-[200px] rounded-md object-contain" 
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="absolute top-0 right-0 h-8 w-8 p-0"
-                          onClick={() => setItemForm({...itemForm, image_url: ''})}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <>
-                        <Upload className="h-10 w-10 text-gray-400 mb-2" />
-                        <p className="text-sm text-gray-500 mb-2">Click or drag to upload</p>
-                        <input
-                          id="image"
-                          type="file"
-                          accept="image/*"
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                          onChange={handleImageFileSelect}
-                        />
-                      </>
-                    )}
-                  </div>
-                </div>
-                
-                <DialogFooter>
-                  <Button type="submit">
-                    {isEditing ? 'Update Item' : 'Add Item'}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-          
-          {/* Category Management Dialog */}
-          <Dialog
-            open={categoryModalOpen}
-            onOpenChange={setCategoryModalOpen}
-            onInteractOutside={(e) => {
-              // Prevent closing when clicking outside
-              e.preventDefault();
-            }}
-          >
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Manage Categories</DialogTitle>
-                <DialogDescription>
-                  Add, edit, or delete categories for your wishlist items
-                </DialogDescription>
-              </DialogHeader>
-              
-              <div className="space-y-4">
-                <form onSubmit={handleCategorySave} className="flex gap-2">
-                  <Input 
-                    value={categoryForm.name}
-                    onChange={(e) => setCategoryForm({...categoryForm, name: e.target.value})}
-                    placeholder="New category name"
-                    className="flex-1"
-                  />
-                  <Button type="submit">
-                    {editingCategory ? 'Update' : 'Add'}
-                  </Button>
-                  {editingCategory && (
-                    <Button 
-                      type="button" 
-                      variant="outline"
-                      onClick={() => {
-                        setCategoryForm({ id: '', name: '' });
-                        setEditingCategory(null);
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                  )}
-                </form>
-                
-                <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                  {categories.map((category) => (
-                    <div 
-                      key={category.id}
-                      className="flex justify-between items-center border rounded-md p-2"
-                    >
+              </div>
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium mb-1">Category</label>
+                <Select 
+                  value={itemForm.category_id} 
+                  onValueChange={(value) => setItemForm({...itemForm, category_id: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No category</SelectItem>
+                    {categories.map(cat => (
+                      <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter className="mt-6">
+              <Button variant="outline" type="button" onClick={() => {
+                resetItemForm();
+                setAddItemOpen(false);
+              }}>
+                Cancel
+              </Button>
+              <Button type="submit">
+                {isEditing ? 'Update Item' : 'Add Item'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Manage Categories Modal */}
+      <Dialog 
+        open={manageCategoriesOpen} 
+        onOpenChange={(open) => {
+          if (!open) {
+            setManageCategoriesOpen(false);
+            resetCategoryForm();
+          }
+        }}
+      >
+        <DialogContent className="max-w-md" onInteractOutside={(e) => e.preventDefault()}>
+          <DialogHeader>
+            <DialogTitle>Manage Categories</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <form onSubmit={handleSaveCategory} className="flex items-end gap-2">
+              <div className="flex-1">
+                <label htmlFor="categoryName" className="block text-sm font-medium mb-1">
+                  {editingCategory ? 'Edit Category' : 'New Category'}
+                </label>
+                <Input 
+                  id="categoryName" 
+                  value={categoryForm.name} 
+                  onChange={(e) => setCategoryForm({...categoryForm, name: e.target.value})}
+                  placeholder="Category name"
+                  required
+                />
+              </div>
+              <Button type="submit">
+                {editingCategory ? 'Update' : 'Add'}
+              </Button>
+            </form>
+            
+            <div className="border-t pt-4">
+              <h3 className="font-medium mb-2">Existing Categories</h3>
+              {categories.length === 0 ? (
+                <p className="text-sm text-gray-500">No categories yet</p>
+              ) : (
+                <div className="space-y-2">
+                  {categories.map(category => (
+                    <div key={category.id} className="flex justify-between items-center p-2 bg-gray-50 rounded-md">
                       <span>{category.name}</span>
-                      <div className="flex space-x-1">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
+                      <div className="flex gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8"
                           onClick={() => handleEditCategory(category)}
                         >
-                          <Pencil className="h-4 w-4" />
+                          <Pencil size={16} />
                         </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-red-500"
                           onClick={() => handleDeleteCategory(category.id)}
                         >
-                          <Trash2 className="h-4 w-4 text-destructive" />
+                          <Trash2 size={16} />
                         </Button>
                       </div>
                     </div>
                   ))}
-                  
-                  {categories.length === 0 && (
-                    <p className="text-center text-muted-foreground py-4">No categories yet</p>
-                  )}
                 </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </main>
-      )}
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setManageCategoriesOpen(false);
+              resetCategoryForm();
+            }}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
