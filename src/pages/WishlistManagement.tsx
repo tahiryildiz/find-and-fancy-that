@@ -911,18 +911,7 @@ export default function WishlistManagement() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredItems.map((item) => (
-                  <a 
-                    key={item.id} 
-                    href={item.url || '#'} 
-                    target={item.url ? "_blank" : "_self"}
-                    rel="noopener noreferrer"
-                    className="block h-full"
-                    onClick={(e) => {
-                      if (!item.url) {
-                        e.preventDefault();
-                      }
-                    }}
-                  >
+                  <div key={item.id} className="block h-full">
                     <Card className="overflow-hidden flex flex-col h-full transition-all hover:shadow-lg cursor-pointer">
                       {item.image_url && (
                         <div className="aspect-[4/3] overflow-hidden bg-muted">
@@ -983,7 +972,7 @@ export default function WishlistManagement() {
                         )}
                       </CardContent>
                     </Card>
-                  </a>
+                  </div>
                 ))}
               </div>
             )}

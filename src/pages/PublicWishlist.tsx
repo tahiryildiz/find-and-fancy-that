@@ -258,8 +258,8 @@ export default function PublicWishlist() {
                 style={{ backgroundColor: wishlist.background_color }}
               >
                 {item.image_url && (
-                  <div className="aspect-square overflow-hidden p-3">
-                    <div className="w-full h-full overflow-hidden rounded-md">
+                  <div className="aspect-square overflow-hidden p-6">
+                    <div className="w-full h-full overflow-hidden rounded-lg">
                       <img
                         src={item.image_url}
                         alt={item.title}
@@ -279,12 +279,6 @@ export default function PublicWishlist() {
                       </p>
                     )}
                   </div>
-
-                  {item.price && (
-                    <Badge variant="secondary" className="text-xs">
-                      {item.price}
-                    </Badge>
-                  )}
 
                   {/* Kart altındaki kategori ve fiyat bilgileri kalır, beğeni ve link kaldırıldı */}
                   <div className="flex flex-wrap gap-2 pt-2">
