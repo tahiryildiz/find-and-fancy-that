@@ -243,11 +243,26 @@ export default function WishlistManagement() {
       }
       
       if (isEditing) {
+        // When brand is added or changed, update the title to follow 'Brand + Name' format
+        const oldItem = items.find(item => item.id === itemForm.id);
+        let updatedTitle = itemForm.title;
+        
+        // Check if brand was added or changed and update title if needed
+        if (itemForm.brand && (!oldItem?.brand || oldItem.brand !== itemForm.brand)) {
+          // Extract the product name without the brand if it already contains the brand
+          const productNameOnly = oldItem?.brand && itemForm.title.startsWith(oldItem.brand) ? 
+            itemForm.title.slice(oldItem.brand.length).trim() : 
+            itemForm.title;
+            
+          // Format as 'Brand + Name'
+          updatedTitle = `${itemForm.brand} ${productNameOnly}`;
+        }
+        
         // Update existing item
         const { error } = await supabase
           .from('items')
           .update({
-            title: itemForm.title,
+            title: updatedTitle,
             description: itemForm.description,
             url: itemForm.url,
             image_url: imageUrl,
@@ -262,7 +277,7 @@ export default function WishlistManagement() {
         // Update local state
         setItems(prevItems => prevItems.map(item => 
           item.id === itemForm.id ? 
-            {...item, ...itemForm, image_url: imageUrl, category_id: itemForm.category_id === 'none' ? null : itemForm.category_id} : 
+            {...item, ...itemForm, title: updatedTitle, image_url: imageUrl, category_id: itemForm.category_id === 'none' ? null : itemForm.category_id} : 
             item
         ));
         
