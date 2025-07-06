@@ -487,16 +487,16 @@ export default function WishlistManagement() {
         </div>
       ) : (
         <main>
-           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <div>
-              <Button variant="outline" size="sm" className="mb-2" onClick={() => navigate('/dashboard')}>
+           <div className="flex flex-col gap-4 mb-6">
+            <div className="flex items-center justify-between w-full">
+              <h1 className="text-2xl font-bold">{wishlist.title}</h1>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button variant="outline" size="sm" onClick={() => navigate('/dashboard')}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Dashboard
               </Button>
-              <h1 className="text-2xl font-bold">{wishlist.title}</h1>
-            </div>
-            
-            <div className="flex gap-2 flex-wrap sm:flex-nowrap">
+              
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
