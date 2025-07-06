@@ -487,7 +487,7 @@ export default function WishlistManagement() {
         </div>
       ) : (
         <main>
-          <div className="flex justify-between items-center mb-6">
+           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
               <Button variant="outline" size="sm" className="mb-2" onClick={() => navigate('/dashboard')}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -496,7 +496,7 @@ export default function WishlistManagement() {
               <h1 className="text-2xl font-bold">{wishlist.title}</h1>
             </div>
             
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap sm:flex-nowrap">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
@@ -506,7 +506,7 @@ export default function WishlistManagement() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => {
-                    const shareUrl = `${window.location.origin}/w/${wishlist?.slug}`;
+                    const shareUrl = `${window.location.origin}/wishlist/${wishlist?.slug}`;
                     navigator.clipboard.writeText(shareUrl);
                     toast({
                       title: "Link copied",
@@ -517,7 +517,7 @@ export default function WishlistManagement() {
                     Copy Link
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => {
-                    const shareUrl = `${window.location.origin}/w/${wishlist?.slug}`;
+                    const shareUrl = `${window.location.origin}/wishlist/${wishlist?.slug}`;
                     if (navigator.share) {
                       navigator.share({
                         title: wishlist?.title || 'My Wishlist',
@@ -536,38 +536,11 @@ export default function WishlistManagement() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button variant="outline" onClick={() => setManageCategoriesOpen(true)} className="mr-2">                
-                <Tags className="h-4 w-4 mr-2" />
-                Manage Categories
-              </Button>
               <Button onClick={() => setAddItemOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Item
               </Button>
-              <Button variant="outline" onClick={() => {
-                // Directly fetch categories from Supabase when opening the modal
-                if (wishlist?.id) {
-                  supabase
-                    .from('categories')
-                    .select('*')
-                    .eq('wishlist_id', wishlist.id)
-                    .order('name')
-                    .then(({ data, error }) => {
-                      if (error) {
-                        console.error('Error fetching categories:', error);
-                        toast({
-                          title: "Error",
-                          description: "Failed to load categories",
-                          variant: "destructive"
-                        });
-                      } else {
-                        console.log('Successfully fetched categories:', data);
-                        setCategories(data || []);
-                      }
-                    });
-                }
-                setManageCategoriesOpen(true);
-              }}>
+              <Button variant="outline" onClick={() => setManageCategoriesOpen(true)}>                
                 <Tags className="h-4 w-4 mr-2" />
                 Manage Categories
               </Button>
@@ -901,11 +874,14 @@ export default function WishlistManagement() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Categories</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
+                    {/* Only show categories that have associated items */}
+                    {categories
+                      .filter(category => items.some(item => item.category_id === category.id))
+                      .map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
