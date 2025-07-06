@@ -1,6 +1,9 @@
 // Database types for the application
 import { Database } from '../integrations/supabase/types';
 
+// Language type for i18n
+export type Language = 'en' | 'tr' | 'de' | 'fr' | string;
+
 // Type for wishlists
 export interface Wishlist {
   id: string;

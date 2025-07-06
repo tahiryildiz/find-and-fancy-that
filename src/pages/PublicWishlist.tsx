@@ -213,7 +213,9 @@ export default function PublicWishlist() {
             >
               {t('all', lang) || 'Tümü'}
             </button>
-            {categories.map((category) => (
+            {categories
+              .filter(category => items.some(item => item.category_id === category.id))
+              .map((category) => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
@@ -239,18 +241,31 @@ export default function PublicWishlist() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredItems.map((item) => (
+              <a 
+                key={item.id}
+                href={item.url || '#'} 
+                target={item.url ? "_blank" : "_self"}
+                rel="noopener noreferrer"
+                className="block h-full transition-all hover:scale-[1.02] duration-300"
+                onClick={(e) => {
+                  if (!item.url) {
+                    e.preventDefault();
+                  }
+                }}
+              >
               <Card 
-                key={item.id} 
-                className="group hover:shadow-lg transition-shadow overflow-hidden"
+                className="group hover:shadow-lg transition-shadow overflow-hidden h-full"
                 style={{ backgroundColor: wishlist.background_color }}
               >
                 {item.image_url && (
-                  <div className="aspect-square overflow-hidden">
-                    <img
-                      src={item.image_url}
-                      alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                  <div className="aspect-square overflow-hidden p-3">
+                    <div className="w-full h-full overflow-hidden rounded-md">
+                      <img
+                        src={item.image_url}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
                   </div>
                 )}
                 <CardContent className="p-4 space-y-3">
@@ -271,44 +286,29 @@ export default function PublicWishlist() {
                     </Badge>
                   )}
 
-                  <div className="flex items-center justify-between pt-2">
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => handleInteraction(item.id, 'heart')}
-                        className="flex items-center gap-1 text-sm text-foreground/70 hover:text-red-500 transition-colors"
-                      >
-                        <Heart className="w-4 h-4" />
-                        {item.heart_count}
-                      </button>
-                      <button
-                        onClick={() => handleInteraction(item.id, 'thumbs_up')}
-                        className="flex items-center gap-1 text-sm text-foreground/70 hover:text-blue-500 transition-colors"
-                      >
-                        <ThumbsUp className="w-4 h-4" />
-                        {item.thumbs_up_count}
-                      </button>
-                    </div>
+                  {/* Kart altındaki kategori ve fiyat bilgileri kalır, beğeni ve link kaldırıldı */}
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {item.category_id && categories.find(c => c.id === item.category_id) && (
+                      <Badge variant="secondary" className="text-xs">
+                        {categories.find(c => c.id === item.category_id)?.name}
+                      </Badge>
+                    )}
                     
-                    {item.url && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        asChild
-                        className="h-8 w-8 p-0"
-                      >
-                        <a
-                          href={item.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center justify-center"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      </Button>
+                    {item.brand && (
+                      <Badge variant="outline" className="text-xs bg-blue-50">
+                        {item.brand}
+                      </Badge>
+                    )}
+                    
+                    {item.price && (
+                      <Badge variant="outline" className="text-xs">
+                        {item.price}
+                      </Badge>
                     )}
                   </div>
                 </CardContent>
               </Card>
+              </a>
             ))}
           </div>
         )}
