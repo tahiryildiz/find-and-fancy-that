@@ -506,7 +506,7 @@ export default function WishlistManagement() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => {
-                    const shareUrl = `${window.location.origin}/wishlist/${wishlist?.slug}`;
+                    const shareUrl = `${window.location.origin}/w/${wishlist?.slug}`;
                     navigator.clipboard.writeText(shareUrl);
                     toast({
                       title: "Link copied",
@@ -517,7 +517,7 @@ export default function WishlistManagement() {
                     Copy Link
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => {
-                    const shareUrl = `${window.location.origin}/wishlist/${wishlist?.slug}`;
+                    const shareUrl = `${window.location.origin}/w/${wishlist?.slug}`;
                     if (navigator.share) {
                       navigator.share({
                         title: wishlist?.title || 'My Wishlist',
