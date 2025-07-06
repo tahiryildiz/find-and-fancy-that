@@ -72,6 +72,7 @@ export default function WishlistManagement() {
     url: '',
     image_url: '',
     price: '',
+    brand: '',
     category_id: 'none'
   });
 
@@ -456,6 +457,7 @@ export default function WishlistManagement() {
         url: '',
         image_url: '',
         price: '',
+        brand: '',
         category_id: 'none'
       });
       setAddItemOpen(false);
@@ -561,6 +563,7 @@ export default function WishlistManagement() {
                   url: '',
                   image_url: '',
                   price: '',
+                  brand: '',
                   category_id: 'none'
                 });
               }
@@ -610,6 +613,16 @@ export default function WishlistManagement() {
                       value={itemForm.url}
                       onChange={(e) => setItemForm({...itemForm, url: e.target.value})}
                       placeholder="https://example.com/product"
+                    />
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="brand">Brand (optional)</Label>
+                    <Input
+                      id="brand"
+                      value={itemForm.brand}
+                      onChange={(e) => setItemForm({...itemForm, brand: e.target.value})}
+                      placeholder="e.g., Apple, Samsung, Nike"
                     />
                   </div>
                   
@@ -948,6 +961,12 @@ export default function WishlistManagement() {
                             </Badge>
                           )}
                           
+                          {item.brand && (
+                            <Badge variant="outline" className="text-xs bg-blue-50">
+                              {item.brand}
+                            </Badge>
+                          )}
+
                           {item.price && (
                             <Badge variant="outline" className="text-xs">
                               {item.price}

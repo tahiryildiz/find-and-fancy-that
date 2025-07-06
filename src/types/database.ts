@@ -1,62 +1,46 @@
-export interface Profile {
-  id: string;
-  user_id: string;
-  display_name: string | null;
-  email: string | null;
-  created_at: string;
-  updated_at: string;
-}
+// Database types for the application
+import { Database } from '../integrations/supabase/types';
 
+// Type for wishlists
 export interface Wishlist {
   id: string;
-  user_id: string;
   title: string;
   slug: string;
-  background_color: string;
-  logo_url: string | null;
-  font_family: string;
-  language: string;
-  is_public: boolean;
+  user_id: string;
   created_at: string;
   updated_at: string;
+  is_public: boolean | null;
+  background_color: string | null;
+  font_family: string | null;
+  language: string | null;
+  logo_url: string | null;
 }
 
+// Type for categories
 export interface Category {
   id: string;
-  wishlist_id: string;
   name: string;
   slug: string;
+  wishlist_id: string;
   created_at: string;
 }
 
+// Type for items
 export interface Item {
   id: string;
-  wishlist_id: string;
-  category_id: string | null;
   title: string;
   description: string | null;
   url: string | null;
   image_url: string | null;
   price: string | null;
-  heart_count: number;
-  thumbs_up_count: number;
+  brand: string | null; // Added brand field
+  category_id: string | null;
+  wishlist_id: string;
   created_at: string;
   updated_at: string;
+  heart_count?: number | null;
+  thumbs_up_count?: number | null;
 }
 
-export interface ItemInteraction {
-  id: string;
-  item_id: string;
-  interaction_type: 'heart' | 'thumbs_up';
-  ip_address: string | null;
-  user_agent: string | null;
-  created_at: string;
-}
-
-export type Language = 'tr' | 'en' | 'de' | 'fr' | 'es';
-
-export interface LanguageTexts {
-  [key: string]: {
-    [K in Language]: string;
-  };
-}
+// Type-safe database row access
+export type Tables<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Row"];
