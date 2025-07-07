@@ -78,6 +78,7 @@ export type Database = {
       }
       items: {
         Row: {
+          brand: string | null
           category_id: string | null
           created_at: string
           description: string | null
@@ -92,6 +93,7 @@ export type Database = {
           wishlist_id: string
         }
         Insert: {
+          brand?: string | null
           category_id?: string | null
           created_at?: string
           description?: string | null
@@ -106,6 +108,7 @@ export type Database = {
           wishlist_id: string
         }
         Update: {
+          brand?: string | null
           category_id?: string | null
           created_at?: string
           description?: string | null

@@ -19,24 +19,35 @@ export default function Auth() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    console.log('Authentication attempt:', { isLogin, email });
 
     try {
       let result;
       if (isLogin) {
+        console.log('Attempting to sign in...');
         result = await signIn(email, password);
+        console.log('Sign in result:', result);
       } else {
+        console.log('Attempting to sign up...');
         result = await signUp(email, password);
+        console.log('Sign up result:', result);
       }
 
       if (result.error) {
+        console.error('Auth error:', result.error);
         toast({
-          title: 'Error',
-          description: result.error.message,
+          title: 'Authentication Error',
+          description: result.error.message || 'An error occurred during authentication',
           variant: 'destructive',
         });
       } else {
+        console.log('Authentication successful');
         if (isLogin) {
-          navigate('/dashboard');
+          toast({
+            title: 'Login Successful',
+            description: 'Welcome back!',
+          });
+          setTimeout(() => navigate('/dashboard'), 500);
         } else {
           toast({
             title: 'Account created successfully',
@@ -45,9 +56,10 @@ export default function Auth() {
         }
       }
     } catch (error: any) {
+      console.error('Unexpected error during authentication:', error);
       toast({
         title: 'Error',
-        description: error.message,
+        description: error.message || 'An unexpected error occurred',
         variant: 'destructive',
       });
     } finally {
